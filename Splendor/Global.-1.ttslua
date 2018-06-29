@@ -1,0 +1,998 @@
+local CHAT_WARNING_COLOR = {r = 255 / 255, g = 102 / 255, b = 0 / 255, a = 255 / 255}
+local CHAT_INFO_COLOR = {r = 153 / 255, g = 255 / 255, b = 51 / 255, a = 255 / 255}
+local ACTIVE_GEM_BUTTON_COLOR = {r = 153 / 255, g = 255 / 255, b = 51 / 255, a = 255 / 255}
+local TOKEN_COUNTS_PER_PLAYERS = {nil, 4, 5, 7}
+local PEOPLE_TILES_PER_PLAYERS = {nil, 3, 4, 5}
+local GOLD_TOKEN_COUNT = 5
+local DECK_Z_POSITIONS = { - 7, - 3, 1}
+local CARDS_COUNT = 4
+local CARD_X_POSITIONS = { - 3, 0, 3, 6}
+local PEOPLE_Z_POSITIONS = { - 7, - 3, 1, 5, 9}
+local PERSON_PARAMS = {position = { - 10, 3, nil}, flip = true, rotation = {0, 180, 0}}
+local GEM_MESH_URL = "http://pastebin.com/raw/00YWZ28Y"
+local ERROR_MESSAGE = 'An error occured. You can report it at https://steamcommunity.com/workshop/filedetails/discussion/1416487064/1727575977535194558/'
+local RETURN_TOKENS_MESSAGE = 'You can only have a maximum of 10 gem tokens. Please return the excess amount.'
+local COLOUR_NAME = 'colour'
+local GOLD_NAME = 'gold'
+local MAX_HAND_SIZE = 3
+local MAX_TOKEN_COUNT = 10
+local PERSON_SCORE = 3
+local SCORE_TO_WIN = 15
+local ZONE_VARS = {
+    OWNER = 'name',
+    PLAYER = 'player',
+    BANK = 'bank',
+    COUNT = 'count'
+}
+local COST_COLOUR_NAMES = {
+    r = 'red',
+    w = 'white',
+    g = 'green',
+    b = 'black',
+    u = 'blue'
+}
+local TYPE_NAMES = {
+    token = 'Custom_Model',
+    deck = 'Deck',
+    card = 'Card'
+}
+local PLAYER_Y_ROTATION = {
+    Blue = 0,
+    Pink = 90,
+    Red = 180,
+    Green = 270
+}
+
+function gemButtonParams(tokenCount, mode)
+    local yPos = (tokenCount * 0.1) - 0.5
+    local position = {0, yPos, 0}
+    if mode == 'label' then
+        return {
+            label = tokenCount,
+            click_function = "dummy",
+            position = position,
+            rotation = {0, 180, 0},
+            height = 0,
+            width = 0,
+            font_color = {1, 1, 1, 0.6},
+            font_size = 300
+        }
+    elseif mode == 'get' then
+        return {
+            click_function = "gemButtonClicked",
+            tooltip = 'Select/Take 2',
+            function_owner = self,
+            position = position,
+            height = 400,
+            width = 400,
+            color = {0, 0, 0, 0},
+            hover_color = {0, 1, 0, 0.3}
+        }
+    elseif mode == 'return' then
+        return {
+            click_function = "returnGemClicked",
+            tooltip = 'Return',
+            function_owner = self,
+            position = position,
+            height = 400,
+            width = 400,
+            color = {0, 0, 0, 0},
+            hover_color = {1, 0, 0, 0.3}
+        }
+    else
+        warnAll(ERROR_MESSAGE)
+    end
+end
+
+local CARD_BUTTON_PARAMS = {
+    click_function = "cardClicked",
+    function_owner = self,
+    position = {0, 0.3, 0},
+    height = 1520,
+    width = 1060,
+    color = {0, 0, 0, 0},
+    hover_color = {0, 1, 0, 0.3},
+    tooltip = "Buy/Reserve"
+}
+
+local DECK_BUTTON_PARAMS = {
+    click_function = "cardClicked",
+    function_owner = self,
+    position = {0, -0.3, 0},
+    rotation = {180, 0, 0},
+    height = 1520,
+    width = 1060,
+    color = {0, 0, 0, 0},
+    hover_color = {0, 1, 0, 0.3},
+    tooltip = "Reserve"
+}
+
+function playerCardPosition(player, zone, cardIndex)
+    local pos = zone.getPosition()
+    local offset
+    if (cardIndex == nil) then
+        offset = -4 + #zone.getObjects()
+    else
+        offset = -5 + cardIndex
+    end
+    if player == 'Red' then
+        return {pos.x, pos.y, pos.z - offset}
+    elseif player == 'Blue' then
+        return {pos.x, pos.y, pos.z + offset}
+    elseif player == 'Pink' then
+        return {pos.x + offset, pos.y, pos.z}
+    elseif player == 'Green' then
+        return {pos.x - offset, pos.y, pos.z}
+    else
+        warnAll(ERROR_MESSAGE)
+    end
+end
+
+function personParams(zPoz)
+    return {position = { - 10, 3, zPoz}, flip = true, rotation = {0, 180, 0}}
+end
+
+function setupObjectReferences()
+    gemZones = {
+        white = getObjectFromGUID('1a8069'),
+        blue = getObjectFromGUID('409a8a'),
+        green = getObjectFromGUID('2bd361'),
+        red = getObjectFromGUID('629bcb'),
+        black = getObjectFromGUID('43ec82')
+    }
+    goldGemZone = getObjectFromGUID('f47d76')
+    decks = {
+        getObjectFromGUID("251eb0"),
+        getObjectFromGUID("8dff7a"),
+        getObjectFromGUID("012bb9")
+    }
+    peopleBag = getObjectFromGUID("ee4886")
+    tabletop = getObjectFromGUID("26e1c0")
+    cardZone = getObjectFromGUID("4a8c4b")
+
+    playerZones = {
+        red = preparePlayerZones('eec711', '83393c', '3589f4', '51a5a6', '7c0a5b', '686092', 'fb58db', '96b1f2', '2ea149', '2572b7', '206bfd', 'c94c86'),
+        green = preparePlayerZones('b71c55', 'ae8fda', 'bafe9c', '3bf6a5', 'd4d4c7', 'edff68', '4eb556', '9a57a0', '9a57a0', '49dee6', 'e25046', '60bd21'),
+        blue = preparePlayerZones('5572ef', 'fc149d', 'fd90fb', '006abb', 'edac2b', '9f4184', '846109', '3dfc3f', '0148da', 'ff8fe2', '5a5244', '77dfff'),
+        pink = preparePlayerZones('d9fd6d', 'b5ca51', '8b8e4f', 'fe0a3c', '7f81ba', 'a1546a', 'c38d2d', '54e0ec', 'ff3141', 'da32f2', '18ff34', 'a14c79')
+    }
+	
+	handZones = {
+		red = getObjectFromGUID('caf838'),
+		blue = getObjectFromGUID('82508f'),
+		pink = getObjectFromGUID('5437f5'),
+		green = getObjectFromGUID('902d54'),
+	}
+
+    for colour, zone in pairs(gemZones) do
+        zone.setVar(COLOUR_NAME, colour)
+        zone.setVar(ZONE_VARS.COUNT, 7)
+        zone.setVar(ZONE_VARS.OWNER, ZONE_VARS.BANK)
+    end
+    goldGemZone.setVar(COLOUR_NAME, GOLD_NAME)
+    goldGemZone.setVar(ZONE_VARS.COUNT, 5)
+    goldGemZone.setVar(ZONE_VARS.OWNER, ZONE_VARS.BANK)
+    for playerColour, playerZone in pairs(playerZones) do
+        for colour, zone in pairs(playerZone.gems) do
+            zone.setVar(COLOUR_NAME, colour)
+            zone.setVar(ZONE_VARS.COUNT, 0)
+            zone.setVar(ZONE_VARS.OWNER, ZONE_VARS.PLAYER)
+        end
+    end
+
+    cardToDeckRefferences = {}
+    availablePeople = {}
+    lastRound = false
+    returnMode = false
+end
+
+function preparePlayerZones(gWhite, gBlue, gGreen, gRed, gBlack, gGold, cWhite, cBlue, cGreen, cRed, cBlack, people)
+    return {
+        gems = {
+            white = getObjectFromGUID(gWhite),
+            blue = getObjectFromGUID(gBlue),
+            green = getObjectFromGUID(gGreen),
+            red = getObjectFromGUID(gRed),
+            black = getObjectFromGUID(gBlack),
+            gold = getObjectFromGUID(gGold)
+        },
+        cards = {
+            white = getObjectFromGUID(cWhite),
+            blue = getObjectFromGUID(cBlue),
+            green = getObjectFromGUID(cGreen),
+            red = getObjectFromGUID(cRed),
+            black = getObjectFromGUID(cBlack),
+        },
+        people = getObjectFromGUID(people)
+    }
+end
+
+function onLoad()
+    setupObjectReferences()
+    tabletop.interactable = false
+    peopleBag.interactable = false
+    for k, deck in pairs(decks) do
+        deck.interactable = false
+    end
+end
+
+function scoreTable()
+    for index, colour in pairs(playersOrder) do
+        UI.setAttribute("playerID"..colour , "text", getPlayer(colour).steamName)
+        UI.setAttribute("playerScore"..colour , "text", getPlayer(colour).score)
+        UI.setAttribute("scoreRow"..colour , "color", colour)
+        UI.setAttribute("scoreRow"..colour , "visibility", "Host|Red|Pink|Green|Blue|Grey" )
+    end
+	UI.setAttribute("StartButton", "visibility", "")
+    UI.setAttribute("ScoreSheetPanel", "visibility", "Host|Red|Pink|Green|Blue|Grey" )
+	updateTable()
+end
+
+function scoreTableRefresh()
+        UI.setAttribute("scoreRowRed", "visibility", "" )
+		UI.setAttribute("scoreRowPink", "visibility", "" )
+		UI.setAttribute("scoreRowGreen", "visibility", "" )
+		UI.setAttribute("scoreRowBlue", "visibility", "" )
+end
+
+function updateTable()
+    for index, colour in pairs(playersOrder) do
+        UI.setAttribute("scoreRow"..colour , "outline", "0")
+        UI.setAttribute("playerScore"..colour , "text", getPlayer(colour).score)
+        if colour == currentPlayer then 
+            UI.setAttribute("scoreRow"..colour , "outline", "#ffa31a")
+        end
+    end
+end
+
+function prepareTable()
+    players = getPlayers()
+    playerCount = #players
+    --playerCount = 4 -- dev override
+
+    if (2 <= playerCount and playerCount <= 4) then
+		initGlobalVariables()
+        setPlayersOrder()
+        destroyRedundantObjects()
+        createGemButtons(true)
+        shuffleAndDealCardsFromDecks()
+        shuffleAndDealPeopleFromBag()
+        setNotes('\n')
+        setPlayerTurn(playersOrder[1])
+        scoreTable()
+    else
+        warnAll("Game requires two to four players to be seated")
+    end
+end
+
+function initGlobalVariables()
+    for colour, zone in pairs(gemZones) do
+        zone.setVar(COLOUR_NAME, colour)
+        zone.setVar(ZONE_VARS.COUNT, TOKEN_COUNTS_PER_PLAYERS[playerCount])
+        zone.setVar(ZONE_VARS.OWNER, ZONE_VARS.BANK)
+    end
+    goldGemZone.setVar(COLOUR_NAME, GOLD_NAME)
+    goldGemZone.setVar(ZONE_VARS.COUNT, GOLD_TOKEN_COUNT)
+    goldGemZone.setVar(ZONE_VARS.OWNER, ZONE_VARS.BANK)
+    for playerColour, playerZone in pairs(playerZones) do
+        for colour, zone in pairs(playerZone.gems) do
+            zone.setVar(COLOUR_NAME, colour)
+            zone.setVar(ZONE_VARS.COUNT, 0)
+            zone.setVar(ZONE_VARS.OWNER, ZONE_VARS.PLAYER)
+        end
+    end
+
+    cardToDeckRefferences = {}
+    availablePeople = {}
+    lastRound = false
+    returnMode = false
+end
+
+function setPlayersOrder()
+    playersOrder = {}
+    local randomIndex = math.random(#players)
+    for k, player in pairs(players) do
+        local index = ((randomIndex + k) % #players) + 1
+        playersOrder[index] = player.colour
+    end
+end
+
+function getPlayers()
+    local players = {}
+    for k, colour in pairs(Player.getAvailableColors()) do
+        if (contains(getSeatedPlayers(), colour)) then
+            table.insert(players, {colour = colour, score = 0, steamId = Player[colour].steam_id, steamName = Player[colour].steam_name})
+        end
+    end
+    return players
+end
+
+function awardPoints(playerColour, score)
+    if score == 0 then
+        return
+    end
+    local player = getPlayer(playerColour)
+    player.score = player.score + score
+    warnAll(playerColour .. ' is being awarded ' .. score .. ' prestige points, for a new total of ' .. player.score)
+end
+
+function getPlayer(playerColour)
+    for k, player in pairs(players) do
+        if player.colour == playerColour then
+            return player
+        end
+    end
+    warnAll(ERROR_MESSAGE)
+end
+
+function setPlayerTurn(colour)
+    currentPlayer = colour
+    Player[colour].broadcast('It is your turn now', CHAT_INFO_COLOR)
+end
+
+function nextTurn()
+    resetSelectedGems()
+    changeAllTokensTint()
+    if #getSeatedPlayers() == 0 then
+        return
+    end
+    if not validTokenHandSize() then
+        return
+    end
+    local currentPlayerIndex = getIndex(playersOrder, currentPlayer)
+    local nextPlayerIndex = 1 + (currentPlayerIndex % #playersOrder)
+    local nextPlayer = playersOrder[nextPlayerIndex]
+    if checkWinConditions(nextPlayerIndex) then
+        currentPlayer = 'none'
+        return
+    end
+    if (not contains(getSeatedPlayers(), nextPlayer)) then
+        warnAll(nextPlayer .. ' is no longer seated. Skipping their turn...')
+        currentPlayer = nextPlayer
+        nextTurn()
+        return
+    else
+        setPlayerTurn(playersOrder[nextPlayerIndex])
+		updateTable()
+    end
+end
+
+function countCurrentPlayerTokens()
+    local tokenCount = 0
+    for k, zone in pairs(playerZones[currentPlayer:lower()].gems) do
+        tokenCount = tokenCount + zone.getVar(ZONE_VARS.COUNT)
+    end
+    return tokenCount
+end
+
+function validTokenHandSize()
+    if countCurrentPlayerTokens() > MAX_TOKEN_COUNT then
+       returnMode = true
+       createGemButtons()
+       Player[currentPlayer].broadcast(RETURN_TOKENS_MESSAGE, CHAT_WARNING_COLOR)
+       return false
+   end
+   return true
+end
+
+function checkWinConditions(nextPlayerIndex)
+    if not lastRound then
+        for k, player in pairs(players) do
+            if player.score >= SCORE_TO_WIN then
+                lastRound = true
+                warnAll(currentPlayer .. ' has accumulated enough points to win!')
+                if nextPlayerIndex != 1 then
+                    warnAll('The game will end on ' .. playersOrder[1] .. '\'s turn. Last chance to grab some points!')
+                end
+            end
+        end
+    end
+    if lastRound then
+        if nextPlayerIndex == 1 then
+            local scores = {}
+            for k, player in pairs(players) do
+                scores[player.colour] = player.score
+            end
+            table.sort(scores)
+            warnAll('End game scores:')
+            for colour, score in pairs(scores) do
+                warnAll(colour .. ': ' .. score .. ' points')
+            end
+        end
+        return true
+    end
+    return false
+end
+
+function onPlayerChangeColor(colour)
+    if (players == nil) then
+        return
+    end
+    if (contains(Player.getAvailableColors(), colour)) then
+        for k, player in pairs(players) do
+            if player.steamId == Player[colour].steam_id and player.colour != colour then
+                movePlayersCardsAndTokens(player.colour, colour)
+                if (currentPlayer == player.colour) then
+                    currentPlayer = colour
+                end
+                local playerOrderIndex = getIndex(playersOrder, player.colour)
+                playersOrder[playerOrderIndex] = colour
+                warnAll('Player ' .. player.colour .. ' moved to ' .. colour)
+                player.colour = colour
+            elseif player.steamId != Player[colour].steam_id and player.colour == colour then
+                player.steamId = Player[colour].steam_id
+                warnAll('New player took a vacant seat: ' .. colour)
+            end
+        end
+    else
+        for k, player in pairs(players) do
+            if (not contains(getSeatedPlayers(), player.colour)) then
+                if (currentPlayer == player.colour) then
+                    nextTurn()
+                end
+                warnAll(player.colour .. ' player left their seat.')
+            end
+        end
+    end
+	scoreTableRefresh()
+	scoreTable()
+end
+
+function movePlayersCardsAndTokens(oldColour, newColour)
+    -- todo
+    local newGemZones = playerZones[newColour:lower()].gems
+    for gemZoneColour, gemZone in pairs(playerZones[oldColour:lower()].gems) do
+        local newPosition = newGemZones[gemZoneColour].getPosition()
+        if not isZoneEmpty(gemZone) then
+            gemZone.getObjects()[1].setPosition(newPosition)
+        end
+    end
+
+    local newCardZones = playerZones[newColour:lower()].cards
+    for colour, cardZone in pairs(playerZones[oldColour:lower()].cards) do
+        local newZone = newCardZones[colour]
+        for index, card in pairs(cardZone.getObjects()) do
+            card.setPosition(playerCardPosition(newColour, newZone, index))
+            card.setRotation({x = 0, y = PLAYER_Y_ROTATION[newColour], z = 0})
+        end
+    end
+end
+
+function warnAll(message)
+    broadcastToAll(message, CHAT_WARNING_COLOR)
+end
+
+function cardPosition(xPos, zPos)
+    return {xPos, 3, zPos}
+end
+
+function dealCard(object, position)
+    if isDeck(object) then
+        local card = object.takeObject({position = position, flip = true})
+        local parsedCard = parseCard(card)
+        cardToDeckRefferences[parsedCard.id] = getIndex(decks, object)
+        card.createButton(CARD_BUTTON_PARAMS)
+        refreshDeckTooltip(object)
+    elseif isCard(object) then
+        object.setPosition({position = position, flip = true})
+    else
+        warnAll(ERROR_MESSAGE)
+    end
+end
+
+function refreshDeckTooltip(deck)
+    local button = deck.getButtons()[1]
+    button.tooltip = 'Reserve\n('.. deck.getQuantity() .. ' left)'
+    deck.editButton(button)
+end
+
+function shuffleAndDealCardsFromDecks()
+    for deckIndex, deck in pairs(decks) do
+        deck.shuffle()
+        deck.createButton(DECK_BUTTON_PARAMS)
+        for i = 1, CARDS_COUNT do
+            dealCard(deck, cardPosition(CARD_X_POSITIONS[i], DECK_Z_POSITIONS[deckIndex]))
+        end
+    end
+end
+
+function shuffleAndDealPeopleFromBag()
+    peopleBag.shuffle()
+    for i = 1, PEOPLE_TILES_PER_PLAYERS[playerCount] do
+        local person = peopleBag.takeObject(personParams(PEOPLE_Z_POSITIONS[i]))
+        person.interactable = false
+        table.insert(availablePeople, {object = person, parsed = parsePerson(person)})
+    end
+end
+
+function createGemButtons(init)
+    resetSelectedGems()
+    for k, zone in pairs(gemZones) do
+        if init then
+            createGemButtonsForZone(zone, TOKEN_COUNTS_PER_PLAYERS[playerCount])
+        else
+            createGemButtonsForZone(zone)
+        end
+    end
+    if init then
+        createGemButtonsForZone(goldGemZone, GOLD_TOKEN_COUNT)
+    else
+        createGemButtonsForZone(goldGemZone)
+        for playerColour, playerZone in pairs(playerZones) do
+            for colour, zone in pairs(playerZone.gems) do
+                createGemButtonsForZone(zone)
+            end
+        end
+    end
+end
+
+function createGemButtonsForZone(zone, count)
+    if zone.getButtons() != nil then
+        local buttonCount = #zone.getButtons()
+        while buttonCount > 0 do
+            zone.removeButton(buttonCount - 1)
+            buttonCount = buttonCount - 1
+        end
+    end
+    if count == nil then
+        count = zone.getVar(ZONE_VARS.COUNT)
+    end
+
+    if count > 0 then
+        zone.createButton(gemButtonParams(count, 'label'))
+		if not returnMode and zone.getVar(ZONE_VARS.OWNER) == ZONE_VARS.BANK and zone.getVar(COLOUR_NAME) != GOLD_NAME then
+			zone.createButton(gemButtonParams(count, 'get'))
+        elseif returnMode and zone.getVar(ZONE_VARS.OWNER) == ZONE_VARS.PLAYER then
+            zone.createButton(gemButtonParams(count, 'return'))
+		end
+	end
+end
+
+function destroyRedundantObjects()
+    local gemsToDestroyCount = 7 - TOKEN_COUNTS_PER_PLAYERS[playerCount]
+    for k, zone in pairs(gemZones) do
+        local gemsToDestroy = getTopTokensFromZone(zone, gemsToDestroyCount)
+        for a, gem in ipairs(gemsToDestroy) do
+            gem.destruct()
+        end
+    end
+    peopleBag.destruct()
+end
+
+function resetSelectedGems()
+    selectedGems = {
+        red = false,
+        white = false,
+        green = false,
+        black = false,
+        blue = false
+    }
+end
+
+function countSelectedGems()
+    return #getSelectedGemColours()
+end
+
+function getSelectedGemColours()
+    local colours = {}
+    local i = 1
+    for colour, isSelected in pairs(selectedGems) do
+        if isSelected then
+            colours[i] = colour
+            i = i + 1
+        end
+    end
+    return colours
+end
+
+function isToken(object)
+    return object.name == TYPE_NAMES.token
+end
+
+function isCard(object)
+    return object.name == TYPE_NAMES.card
+end
+
+function isDeck(object)
+    return object.name == TYPE_NAMES.deck
+end
+
+function canTakeSelectedGems(selectedColours)
+    if countSelectedGems() == 3 then
+        return true
+    end
+    for colour, value in pairs(selectedGems) do
+        if (not value) then
+            if not isZoneEmpty(bankGemZone(colour)) then
+                return false
+            end
+        end
+    end
+    return true
+end
+
+function isValidPlay(player, isReturn)
+    local valid = true
+    if currentPlayer != player then
+        valid = false
+        Player[player].broadcast('Please wait for your turn', CHAT_WARNING_COLOR)
+    elseif returnMode and not isReturn then
+        valid = false
+        Player[player].broadcast(RETURN_TOKENS_MESSAGE, CHAT_WARNING_COLOR)
+    end
+    return valid
+end
+
+function gemButtonClicked(zone, player, alt_click)
+    if (not isValidPlay(player)) then
+        return
+    end
+
+    local colour = zone.getVar(COLOUR_NAME)
+    if alt_click then
+        if getZoneGemCount(bankGemZone(colour)) >= 4 then
+            moveTokens(bankGemZone(colour), playerGemZone(player, colour), 2)
+            nextTurn()
+        else
+            Player[player].broadcast('There need to be at least 4 tokens left in the stack to take 2 of the same colour', CHAT_INFO_COLOR)
+            return
+        end
+    else
+        selectedGems[colour] = not selectedGems[colour]
+        changeTokensTint(zone)
+        if canTakeSelectedGems() then
+            local selectedColours = getSelectedGemColours()
+            takeMultiColoredGems(selectedColours, player)
+        end
+    end
+end
+
+function returnGemClicked(zone, player)
+    if (not isValidPlay(player, true)) then
+        return
+    end
+    local colour = zone.getVar(COLOUR_NAME)
+    moveTokens(playerGemZone(player, colour), bankGemZone(colour), 1)
+    if countCurrentPlayerTokens() <= MAX_TOKEN_COUNT then
+        returnMode = false
+        createGemButtons()
+        nextTurn()
+    end
+end
+
+function takeMultiColoredGems(selectedColours, player)
+    for k, colour in pairs(selectedColours) do
+        moveToken(bankGemZone(colour), playerGemZone(player, colour))
+    end
+    nextTurn()
+end
+
+function getZoneGemCount(zone)
+    if isZoneEmpty(zone) then
+        return 0
+    else
+        return #zone.getObjects()
+    end
+    warnAll(ERROR_MESSAGE)
+end
+
+function isZoneEmpty(zone)
+    return zone.getObjects() == nil or #zone.getObjects() == 0
+end
+
+function changeAllTokensTint()
+    for k, zone in pairs(gemZones) do
+        changeTokensTint(zone)
+    end
+end
+
+function changeTokensTint(zone)
+    local tint = {1, 1, 1}
+    if (selectedGems[zone.getVar(COLOUR_NAME)]) then
+        tint = {0.66, 1, 0.66}
+    end
+
+    for k, v in pairs(zone.getObjects()) do
+        v.setColorTint(tint)
+    end
+end
+
+function contains(tab, val)
+    for index, value in pairs(tab) do
+        if value == val then
+            return true
+        end
+    end
+    return false
+end
+
+function getIndex(tab, val)
+    for k, v in pairs(tab) do
+        if (v == val) then
+            return k
+        end
+    end
+end
+
+function getTopTokensFromZone(zone, count)
+    local topTokens = {}
+    if count == 0 or isZoneEmpty(zone) then
+        return topTokens
+    end
+    local yPositions = {}
+    for k, token in pairs(zone.getObjects()) do
+        table.insert(yPositions, token.getPosition().y)
+    end
+    table.sort(yPositions)
+    local skipCount = #zone.getObjects() - count
+    local minY = yPositions[1 + skipCount]
+    for k, token in pairs(zone.getObjects()) do
+        if minY <= token.getPosition().y then
+            table.insert(topTokens, token)
+        end
+    end
+    return topTokens
+end
+
+function getTopTokenFromZone(zone)
+    return getTopTokensFromZone(zone, 1)[1]
+end
+
+function moveTokens(sourceZone, destinationZone, count)
+    if count == nil then
+        count = 1
+    end
+    local yPos = destinationZone.getPosition().y - 0.55
+    local topDestinationToken = getTopTokenFromZone(destinationZone)
+    if topDestinationToken != nil then
+        yPos = topDestinationToken.getPosition().y
+    end
+    local topTokens = getTopTokensFromZone(sourceZone, count)
+    for i = 1, count do
+        yPos = yPos + 0.1
+        topTokens[i].setPositionSmooth({destinationZone.getPosition().x, yPos, destinationZone.getPosition().z})
+    end
+    sourceZone.setVar(ZONE_VARS.COUNT, sourceZone.getVar(ZONE_VARS.COUNT) - count)
+    destinationZone.setVar(ZONE_VARS.COUNT, destinationZone.getVar(ZONE_VARS.COUNT) + count)
+    createGemButtonsForZone(sourceZone)
+    createGemButtonsForZone(destinationZone)
+end
+
+function moveToken(sourceZone, destinationZone)
+    moveTokens(sourceZone, destinationZone)
+end
+
+function playerGemZone(player, colour)
+    return playerZones[player:lower()].gems[colour]
+end
+
+function bankGemZone(colour)
+    if colour == GOLD_NAME then
+        return goldGemZone
+    end
+    return gemZones[colour]
+end
+
+function payCost(player, cost, goldCost)
+    for colourCode, value in pairs(cost) do
+        local colour = COST_COLOUR_NAMES[colourCode]
+        moveTokens(playerGemZone(player, colour), bankGemZone(colour), value)
+    end
+    moveTokens(playerGemZone(player, GOLD_NAME), bankGemZone(GOLD_NAME), goldCost)
+end
+
+function checkPayment(player, cost)
+    local missingTokensCount = 0
+    local newCost = cost
+    for colourCode, value in pairs(cost) do
+        local gemCount = getZoneGemCount(playerGemZone(player, COST_COLOUR_NAMES[colourCode]))
+        if gemCount < value then
+            missingTokensCount = missingTokensCount + (value - gemCount)
+            newCost[colourCode] = value - missingTokensCount
+        end
+    end
+    local goldGemCount = getZoneGemCount(playerGemZone(player, GOLD_NAME))
+    return {
+        valid = goldGemCount >= missingTokensCount,
+        goldCost = missingTokensCount,
+        cost = newCost
+    }
+end
+
+function considerDiscount(player, cost)
+    local newCost = {}
+    local playerCardZones = playerZones[player:lower()].cards
+    for colour, value in pairs(cost) do
+        local cardZone = playerCardZones[COST_COLOUR_NAMES[colour]]
+        local discount = 0
+        for k, v in pairs(cardZone.getObjects()) do
+            local card = parseCard(v)
+            if colour == card.bonus then
+                discount = discount + 1
+            end
+        end
+        if cost[colour] - discount > 0 then
+            newCost[colour] = cost[colour] - discount
+        end
+    end
+    return newCost
+end
+
+function parseCostString(costString)
+    local cost = {}
+    for capture in string.gmatch(costString, '%d+%a+') do
+        local value = costString.match(capture, '%d+')
+        local colour = costString.match(capture, '%a+')
+        cost[colour] = tonumber(value)
+    end
+    return cost
+end
+
+function parseCard(object)
+    local substrings = {}
+    for s in string.gmatch(object.getName(), '%S+') do
+        table.insert(substrings, s)
+    end
+    return {
+        id = substrings[1],
+        score = tonumber(substrings[2]),
+        bonus = substrings[3],
+        cost = parseCostString(substrings[4])
+    }
+end
+
+function parsePerson(object)
+    local substrings = {}
+    for s in string.gmatch(object.getName(), '%S+') do
+        table.insert(substrings, s)
+    end
+    return {
+        score = PERSON_SCORE,
+        cost = parseCostString(substrings[1])
+    }
+end
+
+function dealNewCardInPlaceOf(object)
+    local position = object.getPosition()
+    local card = parseCard(object)
+    local deck = decks[cardToDeckRefferences[card.id]]
+    if deck == nil then
+        return
+    elseif deck.getQuantity() > 2 then
+        dealCard(deck, cardPosition(position.x, position.z))
+    else
+        local deckPosition = deck.getPosition()
+        dealCard(deck, cardPosition(position.x, position.z))
+        local lastCard = deck.takeObject({top = false, position = deckPosition, smooth = false})
+        lastCard.createButton(DECK_BUTTON_PARAMS)
+    end
+end
+
+function cardClicked(object, player, alt_click)
+    if not isValidPlay(player) then
+        return
+    end
+    local playerZone = playerZones[player:lower()]
+    if isCard(object) then
+        if not alt_click then
+            playCard(object, player, true)
+        else
+            reserveCard(player, object, true)
+        end
+    elseif isDeck(object) then
+        reserveCard(player, object, false)
+    end
+end
+
+function onObjectPickUp(player, object)
+    local position = object.getPosition()
+    if not isValidPlay(player) then
+        recreateCard(object, position)
+        return
+    end
+    if isCard(object) then
+        if contains(Player[player].getHandObjects(), object) then
+            playCard(object, player, false)
+        else
+            Player[player].broadcast('You can only play your own cards. Duh.', CHAT_WARNING_COLOR)
+            recreateCard(object, position)
+            return
+        end
+    end
+end
+
+function playCard(object, player, dealNext)
+    local card = parseCard(object)
+    local cost = considerDiscount(player, card.cost)
+    local payment = checkPayment(player, cost)
+    if payment.valid then
+        payCost(player, payment.cost, payment.goldCost)
+        local cardZone = playerZones[player:lower()].cards[COST_COLOUR_NAMES[card.bonus]]
+        local objectJSON = object.getJSON()
+        object.destruct()
+        spawnObjectJSON({json = objectJSON, position = playerCardPosition(player, cardZone), rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}, callback = 'checkPeopleStatus', callback_owner = Global, params = {player = player}})
+        if dealNext then
+            dealNewCardInPlaceOf(object)
+        end
+        awardPoints(player, card.score)
+        nextTurn()
+    else
+        Player[player].broadcast('You dont have enough tokens to play this card', CHAT_INFO_COLOR)
+    end
+end
+
+function reserveDeckCallback(object_spawned, params)
+    object_spawned.interactable = true
+    object_spawned.deal(1, params.player)
+end
+
+function reserveCard(player, object, dealNext)
+    if #Player[player].getHandObjects() >= MAX_HAND_SIZE then
+        Player[player].broadcast('You can only have up to 3 cards reserved at a time', CHAT_INFO_COLOR)
+    else
+        if isDeck(object) then
+            object.takeObject({position = {0, 0, 0}, callback = "reserveDeckCallback", callback_owner = Global, params = {player = player}})
+            refreshDeckTooltip(object)
+        elseif isCard(object) then
+            object.interactable = true
+			object.removeButton(0)
+            object.deal(1, player)
+        end
+        if getZoneGemCount(goldGemZone) > 0 then
+            moveToken(goldGemZone, playerGemZone(player, GOLD_NAME))
+        end
+        if dealNext then
+            dealNewCardInPlaceOf(object)
+        end
+        nextTurn()
+    end
+end
+
+function recreateCard(object, position)
+    local objectJSON = object.getJSON()
+    object.destruct()
+	spawnObjectJSON({json = objectJSON, position = position, rotation = {x = 0, y = 180, z = 0}, callback = "spawn_callback",
+    callback_owner = Global, params = {tooltip = "Dont drag please."}})
+end
+
+function spawn_callback(object_spawned, params)
+    object_spawned.setDescription(params.tooltip)
+    object_spawned.interactable = true
+	object_spawned.deal(1, getIndex(handZones, zone))
+end
+
+function checkPeopleStatus(object_spawned, params)
+    local player = params.player
+    local peopleAcquired = {}
+    for k, person in pairs(availablePeople) do
+        local cost = considerDiscount(player, person.parsed.cost)
+        if next(cost) == nil then
+            table.insert(peopleAcquired, person)
+        end
+    end
+    if #peopleAcquired > 0 then
+        if #peopleAcquired > 1 then
+            warnAll('Picking a noble is not yet supported. Assingning a random noble for now.')
+            -- todo
+        end
+        local person = peopleAcquired[1]
+        local destination = playerCardPosition(player, playerZones[player:lower()].people)
+        person.object.setPositionSmooth(destination)
+        table.remove(availablePeople, getIndex(availablePeople, person))
+        awardPoints(player, person.parsed.score)
+    end
+end
+
+function onObjectSpawn(obj)
+    obj.interactable = false
+end
+
+function onObjectLeaveScriptingZone(zone, object)
+    if contains(handZones, zone) then
+	--object.destruct()
+	--object.clone().deal(1, getIndex(handZones, zone))
+	--object.interactable = true
+	recreateCard(object, {zone.getPosition().x, zone.getPosition().y, zone.getPosition().z})
+	--object
+	end
+end

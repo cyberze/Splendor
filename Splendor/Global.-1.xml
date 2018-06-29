@@ -1,0 +1,50 @@
+<Defaults>
+    <TableLayout class="ScoreTable"
+ width="250"
+ height="300"
+ rectAlignment="UpperRight" offsetXY="-25 -50" cellSpacing="6" cellPadding="5 5 5 5" columnWidths="200 60"/>
+    <Row class="ScoreTableRow" preferredHeight="40"/>
+    <Text color="#FFFFFF" fontSize="16" />
+</Defaults>
+
+<Panel id="StartButton" width="800" height="250" rectAlignment="MiddleCenter" offsetXY="0 -400" hideAnimation="Shrink" visibility="Host">
+<Text alignment="UpperCenter" fontSize="30" fontStyle="Bold" color="#ffa31a">Please have all players seated and click Start to begin.</Text>
+<Button icon="start" alignment="LowerCenter" onClick="prepareTable" color="" width="150" height="150"></Button>
+</Panel> 
+
+<Panel id="ScoreSheetPanel" class="WindowBorder" width="260" height="305" rectAlignment="MiddleRight" showAnimation="Grow" visibility="">
+    <TableLayout id="ScoreTable" class="ScoreTable">
+        <Row id="ScoreRowRed" class="ScoreTableRow"  dontUseTableRowBackground="true" visibility="" color="" outline="" outlineSize="5 5">
+            <Cell>
+                <Text id="playerIDRed">Player 1</Text>
+            </Cell>
+            <Cell>
+                <Text id="playerScoreRed">0</Text>
+            </Cell>
+        </Row>
+        <Row id="ScoreRowBlue" class="ScoreTableRow"  dontUseTableRowBackground="true" visibility="" color="" outline="" outlineSize="5 5">
+            <Cell>
+                <Text id="playerIDBlue">Player 2</Text>
+            </Cell>
+            <Cell>
+                <Text id="playerScoreBlue">0</Text>
+            </Cell>
+        </Row>
+        <Row id="ScoreRowGreen" class="ScoreTableRow"  dontUseTableRowBackground="true" visibility="" color="" outline="" outlineSize="5 5">
+            <Cell>
+                <Text id="playerIDGreen">Player 3</Text>
+            </Cell>
+            <Cell>
+                <Text id="playerScoreGreen">0</Text>
+            </Cell>
+        </Row>
+        <Row id="ScoreRowPink" class="ScoreTableRow"  dontUseTableRowBackground="true" visibility="" color="" outline="#FFFFFF" outlineSize="5 5">
+            <Cell>
+                <Text id="playerIDPink">Player 4</Text>
+            </Cell>
+            <Cell>
+                <Text id="playerScorePink">0</Text>
+            </Cell>
+        </Row>
+    </TableLayout>
+</Panel>
