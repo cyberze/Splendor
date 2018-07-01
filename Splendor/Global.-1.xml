@@ -7,8 +7,16 @@
     <Text color="#FFFFFF" fontSize="16" />
 </Defaults>
 
-<Panel id="StartButton" width="800" height="250" rectAlignment="MiddleCenter" offsetXY="0 -400" hideAnimation="Shrink" visibility="Host">
+<Panel id="nobelPerson" width="700" height="400" rectAlignment="MiddleCenter" hideAnimation="Shrink" visibility="">
+<Button id="nobelPerson1" icon="" rectAlignment="UpperLeft" onClick="pickNobelPerson" color="" width="300" height="300"></Button>
+<Button id="nobelPerson2" icon="" rectAlignment="UpperRight" onClick="pickNobelPerson" color="" width="300" height="300"></Button>
+<Text alignment="LowerCenter" fontSize="30" fontStyle="Bold" color="#ffa31a">Click to choose Nobel Person card to play.</Text>
+</Panel>
+
+
+<Panel id="StartButton" width="800" height="280" rectAlignment="MiddleCenter" offsetXY="0 -400" hideAnimation="Shrink" visibility="Host">
 <Text alignment="UpperCenter" fontSize="30" fontStyle="Bold" color="#ffa31a">Please have all players seated and click Start to begin.</Text>
+<Text alignment="UpperCenter" fontSize="25" fontStyle="Bold" color="#ffff00" offsetXY="0 -33">Please consider rating this game on Steam workshop.</Text>
 <Button icon="start" alignment="LowerCenter" onClick="prepareTable" color="" width="150" height="150"></Button>
 </Panel> 
 
