@@ -18,6 +18,7 @@ local MAX_HAND_SIZE = 3
 local MAX_TOKEN_COUNT = 10
 local PERSON_SCORE = 3
 local SCORE_TO_WIN = 15
+local lastPlayerIndex = 0
 local ZONE_VARS = {
     OWNER = 'name',
     PLAYER = 'player',
@@ -152,11 +153,11 @@ function setupObjectReferences()
 
     playerZones = {
         red = preparePlayerZones('eec711', '83393c', '3589f4', '51a5a6', '7c0a5b', '686092', 'fb58db', '96b1f2', '2ea149', '2572b7', '206bfd', 'c94c86'),
-        green = preparePlayerZones('b71c55', 'ae8fda', 'bafe9c', '3bf6a5', 'd4d4c7', 'edff68', '4eb556', '9a57a0', '9a57a0', '49dee6', 'e25046', '60bd21'),
+        green = preparePlayerZones('b71c55', 'ae8fda', 'bafe9c', '3bf6a5', 'd4d4c7', 'edff68', '4eb556', '9a57a0', '4f4ad1', '49dee6', 'e25046', '60bd21'),
         blue = preparePlayerZones('5572ef', 'fc149d', 'fd90fb', '006abb', 'edac2b', '9f4184', '846109', '3dfc3f', '0148da', 'ff8fe2', '5a5244', '77dfff'),
         pink = preparePlayerZones('d9fd6d', 'b5ca51', '8b8e4f', 'fe0a3c', '7f81ba', 'a1546a', 'c38d2d', '54e0ec', 'ff3141', 'da32f2', '18ff34', 'a14c79')
     }
-	
+
 	handZones = {
 		Red = getObjectFromGUID('caf838'),
 		Blue = getObjectFromGUID('82508f'),
@@ -223,23 +224,23 @@ function scoreTable()
         UI.setAttribute("scoreRow"..colour , "color", colour)
         UI.setAttribute("scoreRow"..colour , "visibility", "Host|Red|Pink|Green|Blue|Grey" )
     end
-	UI.setAttribute("StartButton", "visibility", "")
+	UI.setAttribute("StartButton", "visibility", "Teal")
     UI.setAttribute("ScoreSheetPanel", "visibility", "Host|Red|Pink|Green|Blue|Grey" )
 	updateTable()
 end
 
 function scoreTableRefresh()
-        UI.setAttribute("scoreRowRed", "visibility", "" )
-		UI.setAttribute("scoreRowPink", "visibility", "" )
-		UI.setAttribute("scoreRowGreen", "visibility", "" )
-		UI.setAttribute("scoreRowBlue", "visibility", "" )
+        UI.setAttribute("scoreRowRed", "visibility", "Teal" )
+		UI.setAttribute("scoreRowPink", "visibility", "Teal" )
+		UI.setAttribute("scoreRowGreen", "visibility", "Teal" )
+		UI.setAttribute("scoreRowBlue", "visibility", "Teal" )
 end
 
 function updateTable()
     for index, colour in pairs(playersOrder) do
         UI.setAttribute("scoreRow"..colour , "outline", "0")
         UI.setAttribute("playerScore"..colour , "text", getPlayer(colour).score)
-        if colour == currentPlayer then 
+        if colour == currentPlayer then
             UI.setAttribute("scoreRow"..colour , "outline", "#ffa31a")
         end
     end
@@ -248,7 +249,7 @@ end
 function prepareTable()
     players = getPlayers()
     playerCount = #players
-    playerCount = 4 -- dev override
+    --playerCount = 4 -- dev override
 	if (playerCount < 2) then
 	warnAll("Game requires two to four players to be seated")
 	return
@@ -262,10 +263,6 @@ function prepareTable()
         setNotes('\n')
         setPlayerTurn(playersOrder[1])
         scoreTable()
-		--print("This will run right away.")
-		--startLuaCoroutine(Global, "waitCoroutine")
-		--waitCoroutine()
-		--print("This will run 200 frames after on load.")
     else
         warnAll("Game requires two to four players to be seated")
     end
@@ -337,17 +334,8 @@ function setPlayerTurn(colour)
 end
 
 function nextTurn()
-		for i=1, 20 do
-        coroutine.yield(0)
-		end
     resetSelectedGems()
-		for i=1, 20 do
-        coroutine.yield(0)
-		end
     changeAllTokensTint()
-		for i=1, 20 do
-        coroutine.yield(0)
-		end
     if #getSeatedPlayers() == 0 then
         return
     end
@@ -357,35 +345,19 @@ function nextTurn()
     local currentPlayerIndex = getIndex(playersOrder, currentPlayer)
     local nextPlayerIndex = 1 + (currentPlayerIndex % #playersOrder)
     local nextPlayer = playersOrder[nextPlayerIndex]
-	checkPeopleStatus()
-		for i=1, 100 do
-        coroutine.yield(0)
-		end
-		print("zonk2")
-	if checkWinConditions(nextPlayerIndex) then
+    if checkWinConditions(nextPlayerIndex, currentPlayerIndex) then
         currentPlayer = 'none'
         return
     end
-		for i=1, 100 do
-        coroutine.yield(0)
-		end
-		print("zonk3")
     if (not contains(getSeatedPlayers(), nextPlayer)) then
         warnAll(nextPlayer .. ' is no longer seated. Skipping their turn...')
         currentPlayer = nextPlayer
-        startLuaCoroutine(Global, "nextTurn")
+        nextTurn()
         return
     else
         setPlayerTurn(playersOrder[nextPlayerIndex])
-		for i=1, 20 do
-        coroutine.yield(0)
-		end
-		updateTable()
-		for i=1, 20 do
-        coroutine.yield(0)
-		end
+        updateTable()
     end
-	return 1
 end
 
 function countCurrentPlayerTokens()
@@ -406,32 +378,33 @@ function validTokenHandSize()
    return true
 end
 
-function checkWinConditions(nextPlayerIndex)
+function checkWinConditions(nextPlayerIndex, currentPlayerIndex)
     if not lastRound then
         for k, player in pairs(players) do
             if player.score >= SCORE_TO_WIN then
                 lastRound = true
                 warnAll(currentPlayer .. ' has accumulated enough points to win!')
-                if nextPlayerIndex != 1 then
-                    warnAll('The game will end on ' .. playersOrder[1] .. '\'s turn. Last chance to grab some points!')
+                if nextPlayerIndex != currentPlayerIndex then
+                    lastPlayerIndex = currentPlayerIndex
+                    warnAll('The game will end on ' .. playersOrder[currentPlayerIndex] .. '\'s turn. Last chance to grab some points!')
                 end
             end
         end
     end
         if lastRound then
-        if nextPlayerIndex == 1 then
+        if nextPlayerIndex == lastPlayerIndex then
             local winners = getWinners()
             if #winners > 1 then
                 warnAll('We have a draw!')
-            end									   
-							  
-									   
-            for k, winner in pairs(winners) do
-                warnAll('Congratulations ' .. winner.steam_name .. '! You win!')
             end
+            for k, winner in pairs(winners) do
+              --  warnAll('Congratulations ' .. winner.steam_name .. '! You win!')
+
+            end
+            warnAll('Finished!')
             return true
         end
-				   
+
     end
     return false
 end
@@ -445,7 +418,7 @@ function getWinners()
     end
     local topPlayers = {}
     for k, player in pairs(players) do
-        if player.score == maxScore then
+        if player.score >= maxScore then
             table.insert(topPlayers, player)
         end
     end
@@ -498,7 +471,7 @@ function onPlayerChangeColor(colour)
         for k, player in pairs(players) do
             if (not contains(getSeatedPlayers(), player.colour)) then
                 if (currentPlayer == player.colour) then
-                    startLuaCoroutine(Global, "nextTurn")
+                    nextTurn()
                 end
                 warnAll(player.colour .. ' player left their seat.')
             end
@@ -700,7 +673,7 @@ function gemButtonClicked(zone, player, alt_click)
     if alt_click then
         if getZoneGemCount(bankGemZone(colour)) >= 4 then
             moveTokens(bankGemZone(colour), playerGemZone(player, colour), 2)
-            startLuaCoroutine(Global, "nextTurn")
+            nextTurn()
         else
             Player[player].broadcast('There need to be at least 4 tokens left in the stack to take 2 of the same colour', CHAT_INFO_COLOR)
             return
@@ -724,7 +697,7 @@ function returnGemClicked(zone, player)
     if countCurrentPlayerTokens() <= MAX_TOKEN_COUNT then
         returnMode = false
         createGemButtons()
-        startLuaCoroutine(Global, "nextTurn")
+        nextTurn()
     end
 end
 
@@ -732,7 +705,7 @@ function takeMultiColoredGems(selectedColours, player)
     for k, colour in pairs(selectedColours) do
         moveToken(bankGemZone(colour), playerGemZone(player, colour))
     end
-    startLuaCoroutine(Global, "nextTurn")
+    nextTurn()
 end
 
 function getZoneGemCount(zone)
@@ -967,9 +940,7 @@ function onObjectPickUp(player, object)
     end
     if isCard(object) then
         if contains(Player[player].getHandObjects(), object) then
-            if not playCard(object, player, false) then
-                recreateCard(object, position)
-            end
+            playCard(object, player, false)
         else
             Player[player].broadcast('You can only play your own cards. Duh.', CHAT_WARNING_COLOR)
             recreateCard(object, position)
@@ -987,13 +958,13 @@ function playCard(object, player, dealNext)
         local cardZone = playerZones[player:lower()].cards[COST_COLOUR_NAMES[card.bonus]]
         local objectJSON = object.getJSON()
         object.destruct()
-        spawnObjectJSON({json = objectJSON, position = playerCardPosition(player, cardZone), rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}})
+        spawnObjectJSON({json = objectJSON, position = playerCardPosition(player, cardZone), rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}, callback = 'checkPeopleStatus', callback_owner = Global, params = {player = player}})
         if dealNext then
             dealNewCardInPlaceOf(object)
         end
         awardPoints(player, card.score)
-       --increaseCardCount(player)
-        startLuaCoroutine(Global, "nextTurn")
+        --increaseCardCount(player)
+        nextTurn()
         return true
     else
         Player[player].broadcast('You dont have enough tokens to play this card', CHAT_INFO_COLOR)
@@ -1027,23 +998,24 @@ function reserveCard(player, object, dealNext)
         if dealNext then
             dealNewCardInPlaceOf(object)
         end
-        startLuaCoroutine(Global, "nextTurn")
+        nextTurn()
     end
 end
 
 function recreateCard(object, position)
     local objectJSON = object.getJSON()
-	local interactable = object.interactable													   
+	local interactable = object.interactable
+
     object.destruct()
-	spawnObjectJSON({json = objectJSON, position = position, rotation = {x = 0, y = 180, z = 0}, callback = 'recreateCardCallback', callback_owner = Global, params = {interactable = interactable}})											
+	spawnObjectJSON({json = objectJSON, position = position, rotation = rotation, callback = 'recreateCardCallback', callback_owner = Global, params = {interactable = interactable}})
 end
 
 function recreateCardCallback(card, params)
-    card.interactable = params.interactable										  
+    card.interactable = params.interactable
 end
 
-function checkPeopleStatus()
-    local player = currentPlayer
+function checkPeopleStatus(object_spawned, params)
+    local player = params.player
     local peopleAcquired = {}
     for k, person in pairs(availablePeople) do
         local cost = considerDiscount(player, person.parsed.cost)
@@ -1068,12 +1040,9 @@ function onObjectSpawn(obj)
     obj.interactable = false
 end
 
-function pickNobelPerson(player, value, id)
-	UI.setAttribute("nobelPerson", "visibility", "")
-end
-
-function setPickNobelPerson(playerColor, card1, card2)
-	UI.setAttribute("nobelPerson", "visibility", playerColor)
-	UI.setAttribute("nobelPerson1", "icon", card1)
-	UI.setAttribute("nobelPerson2", "icon", card2)
+function onObjectLeaveScriptingZone(zone, object)
+    if contains(handZones, zone) then
+	recreateCard(object, {zone.getPosition().x, zone.getPosition().y, zone.getPosition().z})
+	broadcastToColor("Please dont drag out of hand zone. Clicking will play card.", getIndex(handZones, zone), CHAT_WARNING_COLOR)
+	end
 end
