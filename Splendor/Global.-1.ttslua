@@ -384,22 +384,21 @@ function checkWinConditions(nextPlayerIndex, currentPlayerIndex)
             if player.score >= SCORE_TO_WIN then
                 lastRound = true
                 warnAll(currentPlayer .. ' has accumulated enough points to win!')
-                if nextPlayerIndex != currentPlayerIndex then
-                    lastPlayerIndex = currentPlayerIndex
-                    warnAll('The game will end on ' .. playersOrder[currentPlayerIndex] .. '\'s turn. Last chance to grab some points!')
+                if nextPlayerIndex != 1 then
+                    --lastPlayerIndex = currentPlayerIndex
+                    warnAll('The game will end on ' .. playersOrder[1] .. '\'s turn. Last chance to grab some points!')
                 end
             end
         end
     end
         if lastRound then
-        if nextPlayerIndex == lastPlayerIndex then
+        if nextPlayerIndex == 1 then
             local winners = getWinners()
             if #winners > 1 then
                 warnAll('We have a draw!')
             end
             for k, winner in pairs(winners) do
-              --  warnAll('Congratulations ' .. winner.steam_name .. '! You win!')
-
+             warnAll('Congratulations ' .. winner.steamName .. '! You win!')
             end
             warnAll('Finished!')
             return true
@@ -418,7 +417,7 @@ function getWinners()
     end
     local topPlayers = {}
     for k, player in pairs(players) do
-        if player.score >= maxScore then
+        if player.score == maxScore then
             table.insert(topPlayers, player)
         end
     end
