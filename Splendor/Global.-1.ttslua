@@ -220,6 +220,7 @@ function preparePlayerZones(gWhite, gBlue, gGreen, gRed, gBlack, gGold, cWhite, 
 end
 
 function onLoad()
+    Player["White"].changeColor("Red")
     setupObjectReferences()
     tabletop.interactable = false
     peopleBag.interactable = false
@@ -235,16 +236,16 @@ function scoreTable()
         UI.setAttribute("scoreRow"..colour , "color", colour)
         UI.setAttribute("scoreRow"..colour , "visibility", "Host|Red|Pink|Green|Blue|Grey" )
     end
-	UI.setAttribute("StartButton", "visibility", "Teal")
+	UI.setAttribute("StartButton", "visibility", "nil")
     UI.setAttribute("ScoreSheetPanel", "visibility", "Host|Red|Pink|Green|Blue|Grey" )
 	updateTable()
 end
 
 function scoreTableRefresh()
-        UI.setAttribute("scoreRowRed", "visibility", "Teal" )
-		UI.setAttribute("scoreRowPink", "visibility", "Teal" )
-		UI.setAttribute("scoreRowGreen", "visibility", "Teal" )
-		UI.setAttribute("scoreRowBlue", "visibility", "Teal" )
+        UI.setAttribute("scoreRowRed", "visibility", "nil" )
+		UI.setAttribute("scoreRowPink", "visibility", "nil" )
+		UI.setAttribute("scoreRowGreen", "visibility", "nil" )
+		UI.setAttribute("scoreRowBlue", "visibility", "nil" )
 end
 
 function updateTable()
@@ -960,7 +961,11 @@ function cardClicked(object, player, alt_click)
 end
 
 function nobelClicked(object, player)
+  if currentPlayer != player then
+    Player[player].broadcast('Please wait for your turn', CHAT_WARNING_COLOR)
+  else
   getNoblePerson(player, object)
+  end
 end
 
 function onObjectPickUp(player, object)
