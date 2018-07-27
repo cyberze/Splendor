@@ -19,6 +19,7 @@ local MAX_TOKEN_COUNT = 10
 local PERSON_SCORE = 3
 local SCORE_TO_WIN = 15
 local lastPlayerIndex = 0
+local nobelPersonPicked = false
 local ZONE_VARS = {
     OWNER = 'name',
     PLAYER = 'player',
@@ -108,6 +109,16 @@ local DECK_BUTTON_PARAMS = {
     tooltip = "Reserve"
 }
 
+local NOBEL_BUTTON_PARAMS = {
+    click_function = "nobelClicked",
+    function_owner = self,
+    position = {0, 0.3, 0},
+    height = 1520,
+    width = 1520,
+    color = {0, 0, 0, 0},
+    hover_color = {0, 1, 0, 0.3},
+    tooltip = "Pick"
+}
 function playerCardPosition(player, zone, cardIndex)
     local pos = zone.getPosition()
     local offset
@@ -304,7 +315,17 @@ function getPlayers()
     local players = {}
     for k, colour in pairs(Player.getAvailableColors()) do
         if (contains(getSeatedPlayers(), colour)) then
-            table.insert(players, {colour = colour, score = 0, steamId = Player[colour].steam_id, steamName = Player[colour].steam_name})
+            table.insert(players, {
+            colour = colour,
+            score = 0,
+            steamId = Player[colour].steam_id,
+            steamName = Player[colour].steam_name,
+            rCount = 0,
+            wCount = 0,
+            gCount = 0,
+            bCount = 0,
+            uCount = 0
+          })
         end
     end
     return players
@@ -317,6 +338,13 @@ function awardPoints(playerColour, score)
     local player = getPlayer(playerColour)
     player.score = player.score + score
     warnAll(playerColour .. ' is being awarded ' .. score .. ' prestige points, for a new total of ' .. player.score)
+end
+
+function addCardCount(playerColour, cardColor)
+  local cardColor = cardColor .. 'Count'
+  local player = getPlayer(playerColour)
+  player[cardColor] = player[cardColor] + 1
+  --warnAll(player[cardColor] .. ' ' .. cardColor)
 end
 
 function getPlayer(playerColour)
@@ -348,6 +376,9 @@ function nextTurn()
     if checkWinConditions(nextPlayerIndex, currentPlayerIndex) then
         currentPlayer = 'none'
         return
+    end
+    if not checkPeopleStatus(currentPlayer) then
+      return
     end
     if (not contains(getSeatedPlayers(), nextPlayer)) then
         warnAll(nextPlayer .. ' is no longer seated. Skipping their turn...')
@@ -848,22 +879,19 @@ end
 
 function considerDiscount(player, cost)
     local newCost = {}
-    local playerCardZones = playerZones[player:lower()].cards
     for colour, value in pairs(cost) do
-        local cardZone = playerCardZones[COST_COLOUR_NAMES[colour]]
         local discount = 0
-        for k, v in pairs(cardZone.getObjects()) do
-            local card = parseCard(v)
-            if colour == card.bonus then
-                discount = discount + 1
-            end
-        end
-        if cost[colour] - discount > 0 then
-            newCost[colour] = cost[colour] - discount
+        local cardColor = colour .. 'Count'
+        local player = getPlayer(player)
+        if cost[colour] - player[cardColor] > 0 then
+            newCost[colour] = cost[colour] - player[cardColor]
         end
     end
     return newCost
 end
+
+
+
 
 function parseCostString(costString)
     local cost = {}
@@ -931,6 +959,10 @@ function cardClicked(object, player, alt_click)
     end
 end
 
+function nobelClicked(object, player)
+  getNoblePerson(player, object)
+end
+
 function onObjectPickUp(player, object)
     local position = object.getPosition()
     if not isValidPlay(player) then
@@ -957,11 +989,12 @@ function playCard(object, player, dealNext)
         local cardZone = playerZones[player:lower()].cards[COST_COLOUR_NAMES[card.bonus]]
         local objectJSON = object.getJSON()
         object.destruct()
-        spawnObjectJSON({json = objectJSON, position = playerCardPosition(player, cardZone), rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}, callback = 'checkPeopleStatus', callback_owner = Global, params = {player = player}})
+        spawnObjectJSON({json = objectJSON, position = playerCardPosition(player, cardZone), rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}})
         if dealNext then
             dealNewCardInPlaceOf(object)
         end
         awardPoints(player, card.score)
+        addCardCount(player, card.bonus)
         --increaseCardCount(player)
         nextTurn()
         return true
@@ -1013,26 +1046,37 @@ function recreateCardCallback(card, params)
     card.interactable = params.interactable
 end
 
-function checkPeopleStatus(object_spawned, params)
-    local player = params.player
+function checkPeopleStatus(player)
+  if nobelPersonPicked == false then
     local peopleAcquired = {}
-    for k, person in pairs(availablePeople) do
+      for k, person in pairs(availablePeople) do
         local cost = considerDiscount(player, person.parsed.cost)
         if next(cost) == nil then
-            table.insert(peopleAcquired, person)
+          table.insert(peopleAcquired, person)
         end
-    end
-    if #peopleAcquired > 0 then
-        if #peopleAcquired > 1 then
-            warnAll('Picking a noble is not yet supported. Assingning a random noble for now.')
-            -- todo
-        end
-        local person = peopleAcquired[1]
-        local destination = playerCardPosition(player, playerZones[player:lower()].people)
-        person.object.setPositionSmooth(destination)
-        table.remove(availablePeople, getIndex(availablePeople, person))
-        awardPoints(player, person.parsed.score)
-    end
+      end
+if #peopleAcquired > 0 then
+if #peopleAcquired > 1 then
+nobelPersonPicked = true
+for k, person in pairs(peopleAcquired) do
+person.object.createButton(NOBEL_BUTTON_PARAMS)
+end
+warnAll('Pick nobel person card by clicking on it.')
+return false
+end
+getNoblePerson(player, peopleAcquired[1].object)
+end
+end
+return true
+end
+
+function getNoblePerson(player, person)
+  local destination = playerCardPosition(player, playerZones[player:lower()].people)
+  --warnAll(person)
+  person.setPositionSmooth(destination)
+  table.remove(availablePeople, getIndex(availablePeople, person))
+  awardPoints(player, 3)
+  nextTurn()
 end
 
 function onObjectSpawn(obj)
