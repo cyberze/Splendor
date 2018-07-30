@@ -261,7 +261,7 @@ end
 function prepareTable()
     players = getPlayers()
     playerCount = #players
-    --playerCount = 4 -- dev override
+    playerCount = 4 -- dev override
 	if (playerCount < 2) then
 	warnAll("Game requires two to four players to be seated")
 	return
@@ -321,11 +321,17 @@ function getPlayers()
             score = 0,
             steamId = Player[colour].steam_id,
             steamName = Player[colour].steam_name,
-            rCount = 0,
-            wCount = 0,
-            gCount = 0,
-            bCount = 0,
-            uCount = 0
+            rCardCount = 0,
+            wCardCount = 0,
+            gCardCount = 0,
+            bCardCount = 0,
+            uCardCount = 0,
+            rGemCount = 0,
+            wGemCount = 0,
+            gGemCount = 0,
+            bGemCount = 0,
+            uGemCount = 0,
+            jGemCount = 0
           })
         end
     end
@@ -342,11 +348,34 @@ function awardPoints(playerColour, score)
 end
 
 function addCardCount(playerColour, cardColor)
-  local cardColor = cardColor .. 'Count'
+  local cardColor = cardColor .. 'CardCount'
   local player = getPlayer(playerColour)
   player[cardColor] = player[cardColor] + 1
-  --warnAll(player[cardColor] .. ' ' .. cardColor)
 end
+
+function changeGemCount(playerColour, gemColour, gemCount)
+  local gemColor = 0
+  local player = getPlayer(playerColour)
+  if gemCount == 0 then
+    return
+  end
+  if gemColour == 'gold' then
+    gemColor = 'jGemCount'
+  else
+    gemColor = getKeyForValue(COST_COLOUR_NAMES, gemColour) .. 'GemCount'
+  end
+  player[gemColor] = player[gemColor] + gemCount
+  warnAll(playerColour .. ' gets ' .. gemCount .. ' of ' .. gemColour .. ' for total of ' .. player[gemColor])
+end
+
+function getKeyForValue( table, value )
+  for k,v in pairs(table) do
+    if v==value then
+      return k
+  end
+end
+end
+
 
 function getPlayer(playerColour)
     for k, player in pairs(players) do
@@ -704,6 +733,7 @@ function gemButtonClicked(zone, player, alt_click)
     if alt_click then
         if getZoneGemCount(bankGemZone(colour)) >= 4 then
             moveTokens(bankGemZone(colour), playerGemZone(player, colour), 2)
+            changeGemCount(player, colour, 2)
             nextTurn()
         else
             Player[player].broadcast('There need to be at least 4 tokens left in the stack to take 2 of the same colour', CHAT_INFO_COLOR)
@@ -715,6 +745,9 @@ function gemButtonClicked(zone, player, alt_click)
         if canTakeSelectedGems() then
             local selectedColours = getSelectedGemColours()
             takeMultiColoredGems(selectedColours, player)
+            for k, color in pairs(selectedColours) do
+              changeGemCount(player, color, 1)
+            end
         end
     end
 end
@@ -725,6 +758,8 @@ function returnGemClicked(zone, player)
     end
     local colour = zone.getVar(COLOUR_NAME)
     moveTokens(playerGemZone(player, colour), bankGemZone(colour), 1)
+
+    changeGemCount(player, colour, -1)
     if countCurrentPlayerTokens() <= MAX_TOKEN_COUNT then
         returnMode = false
         createGemButtons()
@@ -882,7 +917,7 @@ function considerDiscount(player, cost)
     local newCost = {}
     for colour, value in pairs(cost) do
         local discount = 0
-        local cardColor = colour .. 'Count'
+        local cardColor = colour .. 'CardCount'
         local player = getPlayer(player)
         if cost[colour] - player[cardColor] > 0 then
             newCost[colour] = cost[colour] - player[cardColor]
@@ -1031,6 +1066,7 @@ function reserveCard(player, object, dealNext)
         end
         if getZoneGemCount(goldGemZone) > 0 then
             moveToken(goldGemZone, playerGemZone(player, GOLD_NAME))
+            changeGemCount(player, 'gold', 1 )
         end
         if dealNext then
             dealNewCardInPlaceOf(object)
@@ -1076,6 +1112,7 @@ return true
 end
 
 function getNoblePerson(player, person)
+  nobelPersonPicked = false
   local destination = playerCardPosition(player, playerZones[player:lower()].people)
   --warnAll(person)
   person.setPositionSmooth(destination)
