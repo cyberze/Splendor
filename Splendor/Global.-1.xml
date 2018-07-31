@@ -52,41 +52,43 @@
 
 <Panel id="helperRed" class="WindowBorder" width="600" height="50" offsetXY="500 0" rectAlignment="LowerCenter" showAnimation="Grow" visibility="Red">
   <HorizontalLayout childForceExpandWidth="false" childAlignment="MiddleCenter">
-      <Text id="rGemCountRed" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#ff0000" >/</Text><Text id3="rCardCountRed" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
-      <Text id="wGemCountRed" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#FFFFFF" >/</Text><Text id3="wCardCountRed" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#00000000" >a</Text>
-      <Text id="gGemCountRed" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#008000" >/</Text><Text id3="gCardCountRed" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
-      <Text id="bGemCountRed" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#000000" >/</Text><Text id3="bCardCountRed" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
-      <Text id="uGemCountRed" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#0000ff" >/</Text><Text id3="uCardCountRed" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="rGemCountRed" fontStyle="bold" fontSize="40" color="#ff0000">0</Text>
+      <Text fontSize="40" color="#ff0000" >/</Text>
+      <Text id="rCardCountRed" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="wGemCountRed" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#FFFFFF" >/</Text><Text id="wCardCountRed" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="gGemCountRed" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#008000" >/</Text><Text id="gCardCountRed" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="bGemCountRed" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#000000" >/</Text><Text id="bCardCountRed" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="uGemCountRed" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#0000ff" >/</Text><Text id="uCardCountRed" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#00000000" >a</Text>
       <Text id="jGemCountRed" fontStyle="bold" fontSize="40" color="#ffd700">0</Text>
 </HorizontalLayout>
 </Panel>
 <Panel id="helperPink" class="WindowBorder" width="600" height="50" offsetXY="500 0" rectAlignment="LowerCenter" showAnimation="Grow" visibility="Pink">
   <HorizontalLayout childForceExpandWidth="false" childAlignment="MiddleCenter">
-      <Text id="rGemCountPink" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#ff0000" >/</Text><Text id3="rCardCountPink" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
-      <Text id="wGemCountPink" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#FFFFFF" >/</Text><Text id3="wCardCountPink" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#00000000" >a</Text>
-      <Text id="gGemCountPink" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#008000" >/</Text><Text id3="gCardCountPink" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
-      <Text id="bGemCountPink" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#000000" >/</Text><Text id3="bCardCountPink" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
-      <Text id="uGemCountPink" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#0000ff" >/</Text><Text id3="uCardCountPink" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="rGemCountPink" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#ff0000" >/</Text><Text id="rCardCountPink" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="wGemCountPink" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#FFFFFF" >/</Text><Text id="wCardCountPink" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="gGemCountPink" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#008000" >/</Text><Text id="gCardCountPink" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="bGemCountPink" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#000000" >/</Text><Text id="bCardCountPink" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="uGemCountPink" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#0000ff" >/</Text><Text id="uCardCountPink" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#00000000" >a</Text>
       <Text id="jGemCountPink" fontStyle="bold" fontSize="40" color="#ffd700">0</Text>
 </HorizontalLayout>
 </Panel>
 <Panel id="helperGreen" class="WindowBorder" width="600" height="50" offsetXY="500 0" rectAlignment="LowerCenter" showAnimation="Grow" visibility="Green">
   <HorizontalLayout childForceExpandWidth="false" childAlignment="MiddleCenter">
-      <Text id="rGemCountGreen" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#ff0000" >/</Text><Text id3="rCardCountGreen" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
-      <Text id="wGemCountGreen" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#FFFFFF" >/</Text><Text id3="wCardCountGreen" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#00000000" >a</Text>
-      <Text id="gGemCountGreen" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#008000" >/</Text><Text id3="gCardCountGreen" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
-      <Text id="bGemCountGreen" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#000000" >/</Text><Text id3="bCardCountGreen" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
-      <Text id="uGemCountGreen" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#0000ff" >/</Text><Text id3="uCardCountGreen" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="rGemCountGreen" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#ff0000" >/</Text><Text id="rCardCountGreen" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="wGemCountGreen" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#FFFFFF" >/</Text><Text id="wCardCountGreen" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="gGemCountGreen" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#008000" >/</Text><Text id="gCardCountGreen" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="bGemCountGreen" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#000000" >/</Text><Text id="bCardCountGreen" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="uGemCountGreen" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#0000ff" >/</Text><Text id="uCardCountGreen" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#00000000" >a</Text>
       <Text id="jGemCountGreen" fontStyle="bold" fontSize="40" color="#ffd700">0</Text>
 </HorizontalLayout>
 </Panel>
 <Panel id="helperBlue" class="WindowBorder" width="600" height="50" offsetXY="500 0" rectAlignment="LowerCenter" showAnimation="Grow" visibility="Blue">
   <HorizontalLayout childForceExpandWidth="false" childAlignment="MiddleCenter">
-      <Text id="rGemCountBlue" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#ff0000" >/</Text><Text id3="rCardCountBlue" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
-      <Text id="wGemCountBlue" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#FFFFFF" >/</Text><Text id3="wCardCountBlue" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#00000000" >a</Text>
-      <Text id="gGemCountBlue" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#008000" >/</Text><Text id3="gCardCountBlue" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
-      <Text id="bGemCountBlue" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#000000" >/</Text><Text id3="bCardCountBlue" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
-      <Text id="uGemCountBlue" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#0000ff" >/</Text><Text id3="uCardCountBlue" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="rGemCountBlue" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#ff0000" >/</Text><Text id="rCardCountBlue" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="wGemCountBlue" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#FFFFFF" >/</Text><Text id="wCardCountBlue" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="gGemCountBlue" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#008000" >/</Text><Text id="gCardCountBlue" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="bGemCountBlue" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#000000" >/</Text><Text id="bCardCountBlue" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="uGemCountBlue" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#0000ff" >/</Text><Text id="uCardCountBlue" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#00000000" >a</Text>
       <Text id="jGemCountBlue" fontStyle="bold" fontSize="40" color="#ffd700">0</Text>
 </HorizontalLayout>
 </Panel>
