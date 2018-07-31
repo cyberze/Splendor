@@ -1,0 +1,92 @@
+<Defaults>
+    <TableLayout class="ScoreTable"
+ width="250"
+ height="300"
+ rectAlignment="UpperRight" offsetXY="-25 -50" cellSpacing="6" cellPadding="5 5 5 5" columnWidths="200 60"/>
+    <Row class="ScoreTableRow" preferredHeight="40"/>
+    <Text color="#FFFFFF" fontSize="16" />
+</Defaults>
+
+<Panel id="StartButton" width="800" height="280" rectAlignment="MiddleCenter" offsetXY="0 -400" hideAnimation="Shrink" visibility="Host">
+<Text alignment="UpperCenter" fontSize="30" fontStyle="Bold" color="#ffa31a">Please have all players seated and click Start to begin.</Text>
+<Text alignment="UpperCenter" fontSize="25" fontStyle="Bold" color="#ffff00" offsetXY="0 -33">Please consider rating this game on Steam workshop.</Text>
+<Button icon="start" alignment="LowerCenter" onClick="prepareTable" color="" width="150" height="150"></Button>
+</Panel>
+
+<Panel id="ScoreSheetPanel" class="WindowBorder" width="260" height="305" rectAlignment="MiddleRight" showAnimation="Grow" visibility="nil">
+    <TableLayout id="ScoreTable" class="ScoreTable">
+        <Row id="ScoreRow1" class="ScoreTableRow"  dontUseTableRowBackground="true" visibility="nil" color="" outline="" outlineSize="5 5">
+            <Cell>
+                <Text id="playerID1">Player 1</Text>
+            </Cell>
+            <Cell>
+                <Text id="playerScore1">0</Text>
+            </Cell>
+        </Row>
+        <Row id="ScoreRow2" class="ScoreTableRow"  dontUseTableRowBackground="true" visibility="nil" color="" outline="" outlineSize="5 5">
+            <Cell>
+                <Text id="playerID2">Player 2</Text>
+            </Cell>
+            <Cell>
+                <Text id="playerScore2">0</Text>
+            </Cell>
+        </Row>
+        <Row id="ScoreRow3" class="ScoreTableRow"  dontUseTableRowBackground="true" visibility="nil" color="" outline="" outlineSize="5 5">
+            <Cell>
+                <Text id="playerID3">Player 3</Text>
+            </Cell>
+            <Cell>
+                <Text id="playerScore3">0</Text>
+            </Cell>
+        </Row>
+        <Row id="ScoreRow4" class="ScoreTableRow"  dontUseTableRowBackground="true" visibility="nil" color="" outline="#FFFFFF" outlineSize="5 5">
+            <Cell>
+                <Text id="playerID4">Player 4</Text>
+            </Cell>
+            <Cell>
+                <Text id="playerScore4">0</Text>
+            </Cell>
+        </Row>
+    </TableLayout>
+</Panel>
+
+<Panel id="helperRed" class="WindowBorder" width="600" height="50" offsetXY="500 0" rectAlignment="LowerCenter" showAnimation="Grow" visibility="Red">
+  <HorizontalLayout childForceExpandWidth="false" childAlignment="MiddleCenter">
+      <Text id="rGemCountRed" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#ff0000" >/</Text><Text id3="rCardCountRed" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="wGemCountRed" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#FFFFFF" >/</Text><Text id3="wCardCountRed" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="gGemCountRed" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#008000" >/</Text><Text id3="gCardCountRed" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="bGemCountRed" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#000000" >/</Text><Text id3="bCardCountRed" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="uGemCountRed" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#0000ff" >/</Text><Text id3="uCardCountRed" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="jGemCountRed" fontStyle="bold" fontSize="40" color="#ffd700">0</Text>
+</HorizontalLayout>
+</Panel>
+<Panel id="helperPink" class="WindowBorder" width="600" height="50" offsetXY="500 0" rectAlignment="LowerCenter" showAnimation="Grow" visibility="Pink">
+  <HorizontalLayout childForceExpandWidth="false" childAlignment="MiddleCenter">
+      <Text id="rGemCountPink" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#ff0000" >/</Text><Text id3="rCardCountPink" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="wGemCountPink" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#FFFFFF" >/</Text><Text id3="wCardCountPink" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="gGemCountPink" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#008000" >/</Text><Text id3="gCardCountPink" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="bGemCountPink" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#000000" >/</Text><Text id3="bCardCountPink" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="uGemCountPink" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#0000ff" >/</Text><Text id3="uCardCountPink" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="jGemCountPink" fontStyle="bold" fontSize="40" color="#ffd700">0</Text>
+</HorizontalLayout>
+</Panel>
+<Panel id="helperGreen" class="WindowBorder" width="600" height="50" offsetXY="500 0" rectAlignment="LowerCenter" showAnimation="Grow" visibility="Green">
+  <HorizontalLayout childForceExpandWidth="false" childAlignment="MiddleCenter">
+      <Text id="rGemCountGreen" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#ff0000" >/</Text><Text id3="rCardCountGreen" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="wGemCountGreen" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#FFFFFF" >/</Text><Text id3="wCardCountGreen" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="gGemCountGreen" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#008000" >/</Text><Text id3="gCardCountGreen" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="bGemCountGreen" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#000000" >/</Text><Text id3="bCardCountGreen" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="uGemCountGreen" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#0000ff" >/</Text><Text id3="uCardCountGreen" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="jGemCountGreen" fontStyle="bold" fontSize="40" color="#ffd700">0</Text>
+</HorizontalLayout>
+</Panel>
+<Panel id="helperBlue" class="WindowBorder" width="600" height="50" offsetXY="500 0" rectAlignment="LowerCenter" showAnimation="Grow" visibility="Blue">
+  <HorizontalLayout childForceExpandWidth="false" childAlignment="MiddleCenter">
+      <Text id="rGemCountBlue" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#ff0000" >/</Text><Text id3="rCardCountBlue" fontStyle="bold" fontSize="40" color="#ff0000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="wGemCountBlue" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#FFFFFF" >/</Text><Text id3="wCardCountBlue" fontStyle="bold" fontSize="40" color="#FFFFFF">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="gGemCountBlue" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#008000" >/</Text><Text id3="gCardCountBlue" fontStyle="bold" fontSize="40" color="#008000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="bGemCountBlue" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#000000" >/</Text><Text id3="bCardCountBlue" fontStyle="bold" fontSize="40" color="#000000">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="uGemCountBlue" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#0000ff" >/</Text><Text id3="uCardCountBlue" fontStyle="bold" fontSize="40" color="#0000ff">0</Text><Text fontSize="40" color="#00000000" >a</Text>
+      <Text id="jGemCountBlue" fontStyle="bold" fontSize="40" color="#ffd700">0</Text>
+</HorizontalLayout>
+</Panel>
