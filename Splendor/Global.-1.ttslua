@@ -33,6 +33,10 @@ local COST_COLOUR_NAMES = {
     b = 'black',
     u = 'blue'
 }
+local HELPER_FIELDS = {
+  r = 'rCardCount'
+}
+
 local TYPE_NAMES = {
     token = 'Custom_Model',
     deck = 'Deck',
@@ -43,6 +47,30 @@ local PLAYER_Y_ROTATION = {
     Pink = 90,
     Red = 180,
     Green = 270
+}
+local xmlTable = {
+  {
+	tag="Panel",
+	attributes={
+	id="helper",
+	class="WindowBorder",
+	width="260",
+	height="305",
+	offsetXY="0 -100",
+	rectAlignment="LowerCenter",
+	showAnimation="Grow",
+	visibility="Host",
+	},
+	children={
+		{
+		tag="Text",
+		attributes={
+			id="zonk",
+		},
+		value="ZONK",
+		}
+	},
+}
 }
 
 function gemButtonParams(tokenCount, mode)
@@ -231,10 +259,10 @@ end
 
 function scoreTable()
     for index, colour in pairs(playersOrder) do
-        UI.setAttribute("playerID"..colour , "text", getPlayer(colour).steamName)
-        UI.setAttribute("playerScore"..colour , "text", getPlayer(colour).score)
-        UI.setAttribute("scoreRow"..colour , "color", colour)
-        UI.setAttribute("scoreRow"..colour , "visibility", "Host|Red|Pink|Green|Blue|Grey" )
+        UI.setAttribute("playerID"..index , "text", getPlayer(colour).steamName)
+        UI.setAttribute("playerScore"..index , "text", getPlayer(colour).score)
+        UI.setAttribute("scoreRow"..index , "color", colour)
+        UI.setAttribute("scoreRow"..index , "visibility", "Host|Red|Pink|Green|Blue|Grey" )
     end
 	UI.setAttribute("StartButton", "visibility", "nil")
     UI.setAttribute("ScoreSheetPanel", "visibility", "Host|Red|Pink|Green|Blue|Grey" )
@@ -250,15 +278,27 @@ end
 
 function updateTable()
     for index, colour in pairs(playersOrder) do
-        UI.setAttribute("scoreRow"..colour , "outline", "0")
-        UI.setAttribute("playerScore"..colour , "text", getPlayer(colour).score)
+        UI.setAttribute("scoreRow"..index , "outline", "0")
+        UI.setAttribute("playerScore"..index , "text", getPlayer(colour).score)
         if colour == currentPlayer then
-            UI.setAttribute("scoreRow"..colour , "outline", "#ffa31a")
+            UI.setAttribute("scoreRow"..index , "outline", "#ffa31a")
         end
     end
 end
 
+function updateHelper(playerColour)
+  local table = {'rCardCount', 'wCardCount', 'gCardCount', 'bCardCount', 'uCardCount', 'rGemCount', 'wGemCount', 'gGemCount', 'bGemCount', 'uGemCount', 'jGemCount'}
+  local player = getPlayer(playerColour)
+    for i, type in pairs(table) do
+      local id = type .. playerColour
+      UI.setAttribute(id, "text", player[type])
+      warnAll(id)
+    end
+end
+
+
 function prepareTable()
+    --UI.setXmlTable(xmlTable)
     players = getPlayers()
     playerCount = #players
     playerCount = 4 -- dev override
@@ -365,7 +405,7 @@ function changeGemCount(playerColour, gemColour, gemCount)
     gemColor = getKeyForValue(COST_COLOUR_NAMES, gemColour) .. 'GemCount'
   end
   player[gemColor] = player[gemColor] + gemCount
-  warnAll(playerColour .. ' gets ' .. gemCount .. ' of ' .. gemColour .. ' for total of ' .. player[gemColor])
+  --warnAll(playerColour .. ' gets ' .. gemCount .. ' of ' .. gemColour .. ' for total of ' .. player[gemColor])
 end
 
 function getKeyForValue( table, value )
@@ -392,6 +432,7 @@ function setPlayerTurn(colour)
 end
 
 function nextTurn()
+    updateHelper(currentPlayer)
     resetSelectedGems()
     changeAllTokensTint()
     if #getSeatedPlayers() == 0 then
@@ -891,8 +932,10 @@ function payCost(player, cost, goldCost)
     for colourCode, value in pairs(cost) do
         local colour = COST_COLOUR_NAMES[colourCode]
         moveTokens(playerGemZone(player, colour), bankGemZone(colour), value)
+        changeGemCount(player, colour, -value)
     end
     moveTokens(playerGemZone(player, GOLD_NAME), bankGemZone(GOLD_NAME), goldCost)
+    changeGemCount(player, 'gold', -goldCost)
 end
 
 function checkPayment(player, cost)
