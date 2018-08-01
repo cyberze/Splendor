@@ -257,6 +257,18 @@ function onLoad()
     end
 end
 
+function helperOnClick(player, string)
+  if string == "on" then
+      UI.setAttribute("button"..player.color, "text", "Show")
+      UI.setAttribute("button"..player.color, "onClick", "helperOnClick(off)")
+      UI.hide("helper"..player.color)
+  else
+      UI.setAttribute("button"..player.color, "onClick", "helperOnClick(on)")
+      UI.setAttribute("button"..player.color, "text", "Hide")
+      UI.show("helper"..player.color)
+  end
+end
+
 function scoreTable()
     for index, colour in pairs(playersOrder) do
         UI.setAttribute("playerID"..index , "text", getPlayer(colour).steamName)
