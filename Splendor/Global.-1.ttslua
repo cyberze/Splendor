@@ -270,10 +270,9 @@ function scoreTable()
 end
 
 function scoreTableRefresh()
-        UI.setAttribute("scoreRowRed", "visibility", "nil" )
-		UI.setAttribute("scoreRowPink", "visibility", "nil" )
-		UI.setAttribute("scoreRowGreen", "visibility", "nil" )
-		UI.setAttribute("scoreRowBlue", "visibility", "nil" )
+  for i=1,4 do
+    UI.setAttribute("scoreRow"..i, "visibility", "nil" )
+  end
 end
 
 function updateTable()
