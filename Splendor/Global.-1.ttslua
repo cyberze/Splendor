@@ -259,9 +259,11 @@ end
 
 function helperOnClick(player, string)
   if string == "on" then
+    --UI.show("helper"..player.color)
+      --Wait.frames(function() UI.hide("helper"..player.color) warnAll(string) end, 1)
+      UI.hide("helper"..player.color)
       UI.setAttribute("button"..player.color, "text", "Show")
       UI.setAttribute("button"..player.color, "onClick", "helperOnClick(off)")
-      UI.hide("helper"..player.color)
   else
       UI.setAttribute("button"..player.color, "onClick", "helperOnClick(on)")
       UI.setAttribute("button"..player.color, "text", "Hide")
@@ -315,10 +317,9 @@ end
 
 
 function prepareTable()
-    --UI.setXmlTable(xmlTable)
     players = getPlayers()
     playerCount = #players
-    --playerCount = 4 -- dev override
+    playerCount = 4 -- dev override
 	if (playerCount < 2) then
 	warnAll("Game requires two to four players to be seated")
 	return
@@ -332,6 +333,11 @@ function prepareTable()
         setNotes('\n')
         setPlayerTurn(playersOrder[1])
         scoreTable()
+        for i, player in pairs(players) do
+          UI.setAttribute("helper"..player.colour, "visibility", player.colour)
+          UI.setAttribute("button"..player.colour, "visibility", player.colour)
+          UI.show("helper"..player.colour)
+        end
     else
         warnAll("Game requires two to four players to be seated")
     end
@@ -561,61 +567,6 @@ function getWinnersWhenDraw(topPlayers)
         end
     end
     return lowestCardCountPlayers
-end
-function onPlayerChangeColor(colour)
-    if (players == nil) then
-        return
-    end
-    if (contains(Player.getAvailableColors(), colour)) then
-        for k, player in pairs(players) do
-            if player.steamId == Player[colour].steam_id and player.colour != colour then
-                movePlayersCardsAndTokens(player.colour, colour)
-                if (currentPlayer == player.colour) then
-                    currentPlayer = colour
-                end
-                local playerOrderIndex = getIndex(playersOrder, player.colour)
-                playersOrder[playerOrderIndex] = colour
-                warnAll('Player ' .. player.colour .. ' moved to ' .. colour)
-                player.colour = colour
-				scoreTableRefresh()
-				scoreTable()
-            elseif player.steamId != Player[colour].steam_id and player.colour == colour then
-                player.steamId = Player[colour].steam_id
-                warnAll('New player took a vacant seat: ' .. colour)
-				scoreTableRefresh()
-				scoreTable()
-            end
-        end
-    else
-        for k, player in pairs(players) do
-            if (not contains(getSeatedPlayers(), player.colour)) then
-                if (currentPlayer == player.colour) then
-                    nextTurn()
-                end
-                warnAll(player.colour .. ' player left their seat.')
-            end
-        end
-    end
-end
-
-function movePlayersCardsAndTokens(oldColour, newColour)
-    -- todo
-    local newGemZones = playerZones[newColour:lower()].gems
-    for gemZoneColour, gemZone in pairs(playerZones[oldColour:lower()].gems) do
-        local newPosition = newGemZones[gemZoneColour].getPosition()
-        if not isZoneEmpty(gemZone) then
-            gemZone.getObjects()[1].setPosition(newPosition)
-        end
-    end
-
-    local newCardZones = playerZones[newColour:lower()].cards
-    for colour, cardZone in pairs(playerZones[oldColour:lower()].cards) do
-        local newZone = newCardZones[colour]
-        for index, card in pairs(cardZone.getObjects()) do
-            card.setPosition(playerCardPosition(newColour, newZone, index))
-            card.setRotation({x = 0, y = PLAYER_Y_ROTATION[newColour], z = 0})
-        end
-    end
 end
 
 function warnAll(message)
