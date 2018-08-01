@@ -262,10 +262,10 @@ function scoreTable()
         UI.setAttribute("playerID"..index , "text", getPlayer(colour).steamName)
         UI.setAttribute("playerScore"..index , "text", getPlayer(colour).score)
         UI.setAttribute("scoreRow"..index , "color", colour)
-        UI.setAttribute("scoreRow"..index , "visibility", "Host|Red|Pink|Green|Blue|Grey" )
+        UI.setAttribute("scoreRow"..index , "visibility", "" )
     end
 	UI.setAttribute("StartButton", "visibility", "nil")
-    UI.setAttribute("ScoreSheetPanel", "visibility", "Host|Red|Pink|Green|Blue|Grey" )
+    UI.setAttribute("ScoreSheetPanel", "visibility", "" )
 	updateTable()
 end
 
