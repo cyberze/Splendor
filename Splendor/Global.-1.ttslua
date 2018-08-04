@@ -19,7 +19,7 @@ local MAX_TOKEN_COUNT = 10
 local PERSON_SCORE = 3
 local SCORE_TO_WIN = 15
 local lastPlayerIndex = 0
-local nobelPersonPicked = false
+local noblePickMode = false
 local ZONE_VARS = {
     OWNER = 'name',
     PLAYER = 'player',
@@ -259,15 +259,15 @@ end
 
 function helperOnClick(player, string)
   if string == "on" then
-    --UI.show("helper"..player.color)
-      --Wait.frames(function() UI.hide("helper"..player.color) warnAll(string) end, 1)
-      UI.hide("helper"..player.color)
+      --UI.hide("helper"..player.color)
+      UI.setAttribute("helper"..player.color, "visibility", "nil")
       UI.setAttribute("button"..player.color, "text", "Show")
       UI.setAttribute("button"..player.color, "onClick", "helperOnClick(off)")
   else
       UI.setAttribute("button"..player.color, "onClick", "helperOnClick(on)")
       UI.setAttribute("button"..player.color, "text", "Hide")
-      UI.show("helper"..player.color)
+      UI.setAttribute("helper"..player.color, "visibility", player.color)
+      --UI.show("helper"..player.color)
   end
 end
 
@@ -305,13 +305,7 @@ function updateHelper(playerColour)
   local gem = nil
     for i, type in pairs(table) do
       local id = type .. playerColour
-      --if string.match(type, 'Gem') then
       UI.setAttribute(id, "text", player[type])
-      --else
-        --warnAll(gem)
-    --  UI.setAttribute(id, "text", player[type]+player[gem])
-    --  end
-      --warnAll(id .. ' is now ' .. player[type])
     end
 end
 
@@ -319,7 +313,7 @@ end
 function prepareTable()
     players = getPlayers()
     playerCount = #players
-    playerCount = 4 -- dev override
+    --playerCount = 4 -- dev override
 	if (playerCount < 2) then
 	warnAll("Game requires two to four players to be seated")
 	return
@@ -336,7 +330,7 @@ function prepareTable()
         for i, player in pairs(players) do
           UI.setAttribute("helper"..player.colour, "visibility", player.colour)
           UI.setAttribute("button"..player.colour, "visibility", player.colour)
-          UI.show("helper"..player.colour)
+          --UI.show("helper"..player.colour)
         end
     else
         warnAll("Game requires two to four players to be seated")
@@ -428,7 +422,6 @@ function changeGemCount(playerColour, gemColour, gemCount)
     gemColor = getKeyForValue(COST_COLOUR_NAMES, gemColour) .. 'GemCount'
   end
   player[gemColor] = player[gemColor] + gemCount
-  --warnAll(playerColour .. ' gets ' .. gemCount .. ' of ' .. gemColour .. ' for total of ' .. player[gemColor])
 end
 
 function getKeyForValue( table, value )
@@ -454,8 +447,7 @@ function setPlayerTurn(colour)
     Player[colour].broadcast('It is your turn now', CHAT_INFO_COLOR)
 end
 
-function nextTurn()
-    updateHelper(currentPlayer)
+function nextTurn(arg)
     resetSelectedGems()
     changeAllTokensTint()
     if #getSeatedPlayers() == 0 then
@@ -474,7 +466,7 @@ function nextTurn()
     if not checkPeopleStatus(currentPlayer) then
       return
     end
-    nobelPersonPicked = false
+    noblePickMode = false
     if (not contains(getSeatedPlayers(), nextPlayer)) then
         warnAll(nextPlayer .. ' is no longer seated. Skipping their turn...')
         currentPlayer = nextPlayer
@@ -484,6 +476,7 @@ function nextTurn()
         setPlayerTurn(playersOrder[nextPlayerIndex])
         updateTable()
     end
+    updateHelper(currentPlayer)
 end
 
 function countCurrentPlayerTokens()
@@ -1007,14 +1000,6 @@ function cardClicked(object, player, alt_click)
     end
 end
 
-function nobelClicked(object, player)
-  if currentPlayer != player then
-    Player[player].broadcast('Please wait for your turn', CHAT_WARNING_COLOR)
-  else
-  getNoblePerson(player, object)
-  end
-end
-
 function onObjectPickUp(player, object)
     local position = object.getPosition()
     if not isValidPlay(player) then
@@ -1100,7 +1085,6 @@ function recreateCardCallback(card, params)
 end
 
 function checkPeopleStatus(player)
-  if nobelPersonPicked == false then
     local peopleAcquired = {}
       for k, person in pairs(availablePeople) do
         local cost = considerDiscount(player, person.parsed.cost)
@@ -1115,19 +1099,43 @@ if #peopleAcquired > 0 then
         person.object.createButton(NOBEL_BUTTON_PARAMS)
       end
       warnAll('Pick nobel person card by clicking on it.')
+      noblePickMode = true
       return false
+  end
+
+    if noblePickMode == false then
+      getNoblePerson(player, peopleAcquired[1])
     end
-getNoblePerson(player, peopleAcquired[1].object)
-end
 end
 return true
 end
 
+function nobelClicked(object, player)
+  local person
+  if currentPlayer != player then
+    Player[player].broadcast('Please wait for your turn', CHAT_WARNING_COLOR)
+  else
+    for k, person in pairs(availablePeople) do
+      if person.object.getButtons() ~= nil then
+        person.object.removeButton(0)
+        warnAll('btn rem')
+      end
+    end
+
+    for k, v in pairs (availablePeople) do
+      if v.object == object then
+        person = availablePeople[k]
+      end
+    end
+
+
+  getNoblePerson(player, person)
+  end
+end
+
 function getNoblePerson(player, person)
-  nobelPersonPicked = true
   local destination = playerCardPosition(player, playerZones[player:lower()].people)
-  --warnAll(person)
-  person.setPositionSmooth(destination)
+  person.object.setPositionSmooth(destination)
   table.remove(availablePeople, getIndex(availablePeople, person))
   awardPoints(player, 3)
   nextTurn()
