@@ -20,6 +20,7 @@ local PERSON_SCORE = 3
 local SCORE_TO_WIN = 15
 local lastPlayerIndex = 0
 local noblePickMode = false
+local updaterVar = false
 local ZONE_VARS = {
     OWNER = 'name',
     PLAYER = 'player',
@@ -259,7 +260,6 @@ end
 
 function helperOnClick(player, string)
   if string == "on" then
-      --UI.hide("helper"..player.color)
       UI.setAttribute("helper"..player.color, "visibility", "nil")
       UI.setAttribute("button"..player.color, "text", "Show")
       UI.setAttribute("button"..player.color, "onClick", "helperOnClick(off)")
@@ -267,7 +267,6 @@ function helperOnClick(player, string)
       UI.setAttribute("button"..player.color, "onClick", "helperOnClick(on)")
       UI.setAttribute("button"..player.color, "text", "Hide")
       UI.setAttribute("helper"..player.color, "visibility", player.color)
-      --UI.show("helper"..player.color)
   end
 end
 
@@ -301,11 +300,17 @@ end
 
 function updateHelper(playerColour)
   local table = {'rCardCount', 'wCardCount', 'gCardCount', 'bCardCount', 'uCardCount', 'rGemCount', 'wGemCount', 'gGemCount', 'bGemCount', 'uGemCount', 'jGemCount'}
+  local table3 = {r = 'r', w = 'w', g = 'g', b = 'b', u = 'u', j = 'j'}
   local player = getPlayer(playerColour)
-  local gem = nil
-    for i, type in pairs(table) do
-      local id = type .. playerColour
-      UI.setAttribute(id, "text", player[type])
+    for i, type in pairs(table3) do
+      local card = type.. 'CardCount'
+      local gem = type.. 'GemCount'
+      local id = gem .. playerColour
+      local id2 = card .. playerColour
+      UI.setAttribute(id, "text", player[gem])
+      if i ~= 'j' then
+      UI.setAttribute(id2, "text", player[gem]+player[card])
+      end
     end
 end
 
@@ -313,7 +318,7 @@ end
 function prepareTable()
     players = getPlayers()
     playerCount = #players
-    --playerCount = 4 -- dev override
+    playerCount = 4 -- dev override
 	if (playerCount < 2) then
 	warnAll("Game requires two to four players to be seated")
 	return
@@ -330,11 +335,12 @@ function prepareTable()
         for i, player in pairs(players) do
           UI.setAttribute("helper"..player.colour, "visibility", player.colour)
           UI.setAttribute("button"..player.colour, "visibility", player.colour)
-          --UI.show("helper"..player.colour)
         end
+        updaterVar = true
     else
         warnAll("Game requires two to four players to be seated")
     end
+
 end
 
 function initGlobalVariables()
@@ -408,6 +414,7 @@ function addCardCount(playerColour, cardColor)
   local cardColor = cardColor .. 'CardCount'
   local player = getPlayer(playerColour)
   player[cardColor] = player[cardColor] + 1
+  updateHelper(playerColour)
 end
 
 function changeGemCount(playerColour, gemColour, gemCount)
@@ -422,6 +429,7 @@ function changeGemCount(playerColour, gemColour, gemCount)
     gemColor = getKeyForValue(COST_COLOUR_NAMES, gemColour) .. 'GemCount'
   end
   player[gemColor] = player[gemColor] + gemCount
+  updateHelper(playerColour)
 end
 
 function getKeyForValue( table, value )
@@ -476,7 +484,6 @@ function nextTurn(arg)
         setPlayerTurn(playersOrder[nextPlayerIndex])
         updateTable()
     end
-    updateHelper(currentPlayer)
 end
 
 function countCurrentPlayerTokens()
@@ -504,7 +511,6 @@ function checkWinConditions(nextPlayerIndex, currentPlayerIndex)
                 lastRound = true
                 warnAll(currentPlayer .. ' has accumulated enough points to win!')
                 if nextPlayerIndex != 1 then
-                    --lastPlayerIndex = currentPlayerIndex
                     warnAll('The game will end on ' .. playersOrder[1] .. '\'s turn. Last chance to grab some points!')
                 end
             end
