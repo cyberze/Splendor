@@ -13,6 +13,10 @@
 <Button icon="start" alignment="LowerCenter" onClick="prepareTable" color="" width="150" height="150"></Button>
 </Panel>
 
+<Panel rectAlignment="UpperRight" offsetXY="-250 70" width="300" height="200">
+<Button id= "tintHelper" icon="tintHelperOn" onClick="tintHelperSwitch(on)" color="" width="300" height="200"></Button>
+</Panel>
+
 <Panel id="ScoreSheetPanel" class="WindowBorder" width="260" height="305" rectAlignment="MiddleRight" showAnimation="Grow" visibility="nil">
     <TableLayout id="ScoreTable" class="ScoreTable">
         <Row id="ScoreRow1" class="ScoreTableRow"  dontUseTableRowBackground="true" visibility="nil" color="" outline="" outlineSize="5 5">
