@@ -20,6 +20,7 @@ local PERSON_SCORE = 3
 local SCORE_TO_WIN = 15
 local lastPlayerIndex = 0
 local noblePickMode = false
+local tintHelper = false
 local ZONE_VARS = {
     OWNER = 'name',
     PLAYER = 'player',
@@ -787,8 +788,24 @@ function changeTokensTint(zone)
     end
 end
 
+function tintHelperSwitch(player, string)
+  if string == "off" then
+    warnAll("zonkilla")
+    tintHelper = false
+    UI.setAttribute("tintHelper", "onClick", "tintHelperSwitch(on)")
+    UI.setAttribute("tintHelper", "icon", "tintHelperOn")
+    removeTintCardButton()
+  else
+    warnAll("zonk")
+    tintHelper = true
+    UI.setAttribute("tintHelper", "onClick", "tintHelperSwitch(off)")
+    UI.setAttribute("tintHelper", "icon", "tintHelperOff")
+    cardPlayHelper(currentPlayer)
+  end
+end
+
 function cardPlayHelper(player)
---warnAll('checking now')
+if tintHelper then
   if not isZoneEmpty(cardZone) then
     local cardTable = cardZone.getObjects()
     for i, card in pairs (cardTable) do
@@ -801,6 +818,7 @@ function cardPlayHelper(player)
         end
       end
   end
+end
 end
 end
 
@@ -921,9 +939,7 @@ function checkPayment(player, cost)
     local newCost = cost
     local player = getPlayer(player)
     for colourCode, value in pairs(cost) do
-        warnAll(colourCode)
         local color = colourCode..'GemCount'
-        warnAll(color)
         local gemCount = player[color]
         if gemCount < value then
             missingTokensCount = missingTokensCount + (value - gemCount)
