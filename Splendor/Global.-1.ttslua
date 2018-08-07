@@ -788,7 +788,7 @@ function changeTokensTint(zone)
 end
 
 function cardPlayHelper(player)
-warnAll('checking now')
+--warnAll('checking now')
   if not isZoneEmpty(cardZone) then
     local cardTable = cardZone.getObjects()
     for i, card in pairs (cardTable) do
@@ -919,14 +919,18 @@ end
 function checkPayment(player, cost)
     local missingTokensCount = 0
     local newCost = cost
+    local player = getPlayer(player)
     for colourCode, value in pairs(cost) do
-        local gemCount = getZoneGemCount(playerGemZone(player, COST_COLOUR_NAMES[colourCode]))
+        warnAll(colourCode)
+        local color = colourCode..'GemCount'
+        warnAll(color)
+        local gemCount = player[color]
         if gemCount < value then
             missingTokensCount = missingTokensCount + (value - gemCount)
             newCost[colourCode] = value - missingTokensCount
         end
     end
-    local goldGemCount = getZoneGemCount(playerGemZone(player, GOLD_NAME))
+    local goldGemCount = player['jGemCount']
     return {
         valid = goldGemCount >= missingTokensCount,
         goldCost = missingTokensCount,
