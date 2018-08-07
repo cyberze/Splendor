@@ -20,7 +20,7 @@ local PERSON_SCORE = 3
 local SCORE_TO_WIN = 15
 local lastPlayerIndex = 0
 local noblePickMode = false
-local updaterVar = false
+local tintHelper = false
 local ZONE_VARS = {
     OWNER = 'name',
     PLAYER = 'player',
@@ -34,9 +34,6 @@ local COST_COLOUR_NAMES = {
     b = 'black',
     u = 'blue'
 }
-local HELPER_FIELDS = {
-  r = 'rCardCount'
-}
 
 local TYPE_NAMES = {
     token = 'Custom_Model',
@@ -48,30 +45,6 @@ local PLAYER_Y_ROTATION = {
     Pink = 90,
     Red = 180,
     Green = 270
-}
-local xmlTable = {
-  {
-	tag="Panel",
-	attributes={
-	id="helper",
-	class="WindowBorder",
-	width="260",
-	height="305",
-	offsetXY="0 -100",
-	rectAlignment="LowerCenter",
-	showAnimation="Grow",
-	visibility="Host",
-	},
-	children={
-		{
-		tag="Text",
-		attributes={
-			id="zonk",
-		},
-		value="ZONK",
-		}
-	},
-}
 }
 
 function gemButtonParams(tokenCount, mode)
@@ -122,8 +95,17 @@ local CARD_BUTTON_PARAMS = {
     height = 1520,
     width = 1060,
     color = {0, 0, 0, 0},
-    hover_color = {0, 1, 0, 0.3},
+    hover_color = {0, 1, 0, 0.4},
     tooltip = "Buy/Reserve"
+}
+
+local CARD_TINT_PARAMS = {
+  label = "helperTint",
+  click_function = "dummy",
+  position = {0, 0, 0},
+  height = 1590,
+  width = 1130,
+  color = {1, 0, 0, 1},
 }
 
 local DECK_BUTTON_PARAMS = {
@@ -299,10 +281,9 @@ function updateTable()
 end
 
 function updateHelper(playerColour)
-  local table = {'rCardCount', 'wCardCount', 'gCardCount', 'bCardCount', 'uCardCount', 'rGemCount', 'wGemCount', 'gGemCount', 'bGemCount', 'uGemCount', 'jGemCount'}
-  local table3 = {r = 'r', w = 'w', g = 'g', b = 'b', u = 'u', j = 'j'}
+  local table = {r = 'r', w = 'w', g = 'g', b = 'b', u = 'u', j = 'j'}
   local player = getPlayer(playerColour)
-    for i, type in pairs(table3) do
+    for i, type in pairs(table) do
       local card = type.. 'CardCount'
       local gem = type.. 'GemCount'
       local id = gem .. playerColour
@@ -336,7 +317,6 @@ function prepareTable()
           UI.setAttribute("helper"..player.colour, "visibility", player.colour)
           UI.setAttribute("button"..player.colour, "visibility", player.colour)
         end
-        updaterVar = true
     else
         warnAll("Game requires two to four players to be seated")
     end
@@ -453,11 +433,13 @@ end
 function setPlayerTurn(colour)
     currentPlayer = colour
     Player[colour].broadcast('It is your turn now', CHAT_INFO_COLOR)
+    cardPlayHelper(colour)
 end
 
 function nextTurn(arg)
     resetSelectedGems()
     changeAllTokensTint()
+    removeTintCardButton()
     if #getSeatedPlayers() == 0 then
         return
     end
@@ -595,6 +577,8 @@ function refreshDeckTooltip(deck)
     button.tooltip = 'Reserve\n('.. deck.getQuantity() .. ' left)'
     deck.editButton(button)
 end
+
+
 
 function shuffleAndDealCardsFromDecks()
     for deckIndex, deck in pairs(decks) do
@@ -813,6 +797,65 @@ function changeTokensTint(zone)
     end
 end
 
+function tintHelperSwitch(player, string)
+  if string == "off" then
+     tintHelper = false
+    UI.setAttribute("tintHelper", "onClick", "tintHelperSwitch(on)")
+    UI.setAttribute("tintHelper", "icon", "tintHelperOn")
+    removeTintCardButton()
+  else
+    tintHelper = true
+    UI.setAttribute("tintHelper", "onClick", "tintHelperSwitch(off)")
+    UI.setAttribute("tintHelper", "icon", "tintHelperOff")
+    cardPlayHelper(currentPlayer)
+  end
+end
+
+function cardPlayHelper(player)
+if tintHelper then
+  if not isZoneEmpty(cardZone) then
+    local cardTable = cardZone.getObjects()
+    for i, card in pairs (cardTable) do
+      if isCard(card) then
+      local cardParsed = parseCard(card)
+      local cost = considerDiscount(player, cardParsed.cost)
+      local payment = checkPayment(player, cost)
+        if payment.valid then
+          tintCardButton (card)
+        end
+      end
+  end
+end
+end
+end
+
+function tintCardButton (card)
+  buttonTable = card.getButtons()
+  for i, button in pairs (buttonTable) do
+    if button.label ~= "helperTint" then
+      card.createButton(CARD_TINT_PARAMS)
+    end
+  end
+end
+
+function removeTintCardButton()
+  if not isZoneEmpty(cardZone) then
+    local cardTable = cardZone.getObjects()
+    for i, card in pairs (cardTable) do
+      if isCard(card) then
+      buttonTable = card.getButtons()
+      for i, button in pairs (buttonTable) do
+        if button.label == "helperTint" then
+          warnAll(i)
+          card.removeButton(i-1)
+        end
+      end
+    end
+    end
+    end
+end
+
+
 function contains(tab, val)
     for index, value in pairs(tab) do
         if value == val then
@@ -909,14 +952,16 @@ end
 function checkPayment(player, cost)
     local missingTokensCount = 0
     local newCost = cost
+    local player = getPlayer(player)
     for colourCode, value in pairs(cost) do
-        local gemCount = getZoneGemCount(playerGemZone(player, COST_COLOUR_NAMES[colourCode]))
+        local color = colourCode..'GemCount'
+        local gemCount = player[color]
         if gemCount < value then
             missingTokensCount = missingTokensCount + (value - gemCount)
             newCost[colourCode] = value - missingTokensCount
         end
     end
-    local goldGemCount = getZoneGemCount(playerGemZone(player, GOLD_NAME))
+    local goldGemCount = player['jGemCount']
     return {
         valid = goldGemCount >= missingTokensCount,
         goldCost = missingTokensCount,
