@@ -9,7 +9,6 @@ local CARDS_COUNT = 4
 local CARD_X_POSITIONS = { - 3, 0, 3, 6}
 local PEOPLE_Z_POSITIONS = { - 7, - 3, 1, 5, 9}
 local PERSON_PARAMS = {position = { - 10, 3, nil}, flip = true, rotation = {0, 180, 0}}
-local GEM_MESH_URL = "http://pastebin.com/raw/00YWZ28Y"
 local ERROR_MESSAGE = 'An error occured. You can report it at https://steamcommunity.com/workshop/filedetails/discussion/1416487064/1727575977535194558/'
 local RETURN_TOKENS_MESSAGE = 'You can only have a maximum of 10 gem tokens. Please return the excess amount.'
 local COLOUR_NAME = 'colour'
@@ -18,9 +17,9 @@ local MAX_HAND_SIZE = 3
 local MAX_TOKEN_COUNT = 10
 local PERSON_SCORE = 3
 local SCORE_TO_WIN = 15
-local lastPlayerIndex = 0
 local noblePickMode = false
-local tintHelper = false
+local tintHelper = true
+local soundToggle = 'talk'
 local ZONE_VARS = {
     OWNER = 'name',
     PLAYER = 'player',
@@ -102,7 +101,7 @@ local CARD_BUTTON_PARAMS = {
 local CARD_TINT_PARAMS = {
   label = "helperTint",
   click_function = "dummy",
-  position = {0, 0, 0},
+  position = {0, -0.3, 0},
   height = 1590,
   width = 1130,
   color = {1, 0, 0, 1},
@@ -130,6 +129,7 @@ local NOBEL_BUTTON_PARAMS = {
     hover_color = {0, 1, 0, 0.3},
     tooltip = "Pick"
 }
+
 function playerCardPosition(player, zone, cardIndex)
     local pos = zone.getPosition()
     local offset
@@ -172,6 +172,7 @@ function setupObjectReferences()
     peopleBag = getObjectFromGUID("ee4886")
     tabletop = getObjectFromGUID("26e1c0")
     cardZone = getObjectFromGUID("4a8c4b")
+    dingSound = getObjectFromGUID("e8f82a")
 
     playerZones = {
         red = preparePlayerZones('eec711', '83393c', '3589f4', '51a5a6', '7c0a5b', '686092', 'fb58db', '96b1f2', '2ea149', '2572b7', '206bfd', 'c94c86'),
@@ -235,6 +236,7 @@ function onLoad()
     setupObjectReferences()
     tabletop.interactable = false
     peopleBag.interactable = false
+    dingSound.interactable = false
     for k, deck in pairs(decks) do
         deck.interactable = false
     end
@@ -259,9 +261,9 @@ function scoreTable()
         UI.setAttribute("scoreRow"..index , "color", colour)
         UI.setAttribute("scoreRow"..index , "visibility", "" )
     end
-	UI.setAttribute("StartButton", "visibility", "nil")
-    UI.setAttribute("ScoreSheetPanel", "visibility", "" )
-	updateTable()
+	      UI.setAttribute("StartButton", "visibility", "nil")
+        UI.setAttribute("ScoreSheetPanel", "visibility", "" )
+	      updateTable()
 end
 
 function scoreTableRefresh()
@@ -286,39 +288,38 @@ function updateHelper(playerColour)
     for i, type in pairs(table) do
       local card = type.. 'CardCount'
       local gem = type.. 'GemCount'
-      local id = gem .. playerColour
-      local id2 = card .. playerColour
-      UI.setAttribute(id, "text", player[gem])
+      local gemId = gem .. playerColour
+      local cardId = card .. playerColour
+      UI.setAttribute(gemId, "text", player[gem])
       if i ~= 'j' then
-      UI.setAttribute(id2, "text", player[gem]+player[card])
+        UI.setAttribute(cardId, "text", player[gem]+player[card])
       end
     end
 end
-
 
 function prepareTable()
     players = getPlayers()
     playerCount = #players
     playerCount = 4 -- dev override
 	if (playerCount < 2) then
-	warnAll("Game requires two to four players to be seated")
-	return
+	   warnAll("Game requires two to four players to be seated")
+	   return
 	elseif (2 <= playerCount and playerCount <= 4) then
 		initGlobalVariables()
-        setPlayersOrder()
-        destroyRedundantObjects()
-        createGemButtons(true)
-        shuffleAndDealCardsFromDecks()
-        shuffleAndDealPeopleFromBag()
-        setNotes('\n')
-        setPlayerTurn(playersOrder[1])
-        scoreTable()
-        for i, player in pairs(players) do
+    setPlayersOrder()
+    destroyRedundantObjects()
+    createGemButtons(true)
+    shuffleAndDealCardsFromDecks()
+    shuffleAndDealPeopleFromBag()
+    setNotes('\n')
+    setPlayerTurn(playersOrder[1])
+    scoreTable()
+      for i, player in pairs(players) do
           UI.setAttribute("helper"..player.colour, "visibility", player.colour)
           UI.setAttribute("button"..player.colour, "visibility", player.colour)
-        end
+      end
     else
-        warnAll("Game requires two to four players to be seated")
+      warnAll("Game requires two to four players to be seated")
     end
 
 end
@@ -339,7 +340,6 @@ function initGlobalVariables()
             zone.setVar(ZONE_VARS.OWNER, ZONE_VARS.PLAYER)
         end
     end
-
     cardToDeckRefferences = {}
     availablePeople = {}
     lastRound = false
@@ -387,7 +387,7 @@ function awardPoints(playerColour, score)
     end
     local player = getPlayer(playerColour)
     player.score = player.score + score
-    warnAll(playerColour .. ' is being awarded ' .. score .. ' prestige points, for a new total of ' .. player.score)
+    --warnAll(playerColour .. ' is being awarded ' .. score .. ' prestige points, for a new total of ' .. player.score)
 end
 
 function addCardCount(playerColour, cardColor)
@@ -416,10 +416,9 @@ function getKeyForValue( table, value )
   for k,v in pairs(table) do
     if v==value then
       return k
+    end
   end
 end
-end
-
 
 function getPlayer(playerColour)
     for k, player in pairs(players) do
@@ -433,6 +432,20 @@ end
 function setPlayerTurn(colour)
     currentPlayer = colour
     Player[colour].broadcast('It is your turn now', CHAT_INFO_COLOR)
+
+    if soundToggle == 'ding' then
+    dingSound.AssetBundle.playTriggerEffect(0)
+    elseif soundToggle == 'talk' then
+      if currentPlayer == "Red" then
+        dingSound.AssetBundle.playTriggerEffect(1)
+      elseif currentPlayer == "Green" then
+        dingSound.AssetBundle.playTriggerEffect(2)
+      elseif currentPlayer == "Pink" then
+        dingSound.AssetBundle.playTriggerEffect(3)
+      elseif currentPlayer == "Blue" then
+        dingSound.AssetBundle.playTriggerEffect(4)
+      end
+    end
     cardPlayHelper(colour)
 end
 
@@ -449,14 +462,14 @@ function nextTurn(arg)
     local currentPlayerIndex = getIndex(playersOrder, currentPlayer)
     local nextPlayerIndex = 1 + (currentPlayerIndex % #playersOrder)
     local nextPlayer = playersOrder[nextPlayerIndex]
-    if checkWinConditions(nextPlayerIndex, currentPlayerIndex) then
-        currentPlayer = 'none'
-        return
-    end
     if not checkPeopleStatus(currentPlayer) then
       return
     end
     noblePickMode = false
+    if checkWinConditions(nextPlayerIndex, currentPlayerIndex) then
+        currentPlayer = 'none'
+        return
+    end
     if (not contains(getSeatedPlayers(), nextPlayer)) then
         warnAll(nextPlayer .. ' is no longer seated. Skipping their turn...')
         currentPlayer = nextPlayer
@@ -470,9 +483,8 @@ end
 
 function countCurrentPlayerTokens()
     local tokenCount = 0
-    for k, zone in pairs(playerZones[currentPlayer:lower()].gems) do
-        tokenCount = tokenCount + zone.getVar(ZONE_VARS.COUNT)
-    end
+    local player = getPlayer(currentPlayer)
+    tokenCount = player['wGemCount'] + player['uGemCount'] + player['gGemCount'] + player['rGemCount'] + player['bGemCount'] + player['jGemCount']
     return tokenCount
 end
 
@@ -480,7 +492,11 @@ function validTokenHandSize()
     if countCurrentPlayerTokens() > MAX_TOKEN_COUNT then
        returnMode = true
        createGemButtons()
+       if soundToggle == 'talk' then
+         dingSound.AssetBundle.playTriggerEffect(7)
+       else
        Player[currentPlayer].broadcast(RETURN_TOKENS_MESSAGE, CHAT_WARNING_COLOR)
+        end
        return false
    end
    return true
@@ -628,18 +644,19 @@ function createGemButtonsForZone(zone, count)
             buttonCount = buttonCount - 1
         end
     end
+
     if count == nil then
         count = zone.getVar(ZONE_VARS.COUNT)
     end
 
     if count > 0 then
         zone.createButton(gemButtonParams(count, 'label'))
-		if not returnMode and zone.getVar(ZONE_VARS.OWNER) == ZONE_VARS.BANK and zone.getVar(COLOUR_NAME) != GOLD_NAME then
-			zone.createButton(gemButtonParams(count, 'get'))
-        elseif returnMode and zone.getVar(ZONE_VARS.OWNER) == ZONE_VARS.PLAYER then
-            zone.createButton(gemButtonParams(count, 'return'))
-		end
-	end
+      if not returnMode and zone.getVar(ZONE_VARS.OWNER) == ZONE_VARS.BANK and zone.getVar(COLOUR_NAME) != GOLD_NAME then
+      zone.createButton(gemButtonParams(count, 'get'))
+      elseif returnMode and zone.getVar(ZONE_VARS.OWNER) == ZONE_VARS.PLAYER then
+      zone.createButton(gemButtonParams(count, 'return'))
+		  end
+	  end
 end
 
 function destroyRedundantObjects()
@@ -729,7 +746,11 @@ function gemButtonClicked(zone, player, alt_click)
             changeGemCount(player, colour, 2)
             nextTurn()
         else
+          if soundToggle == 'talk' then
+            dingSound.AssetBundle.playTriggerEffect(5)
+          else
             Player[player].broadcast('There need to be at least 4 tokens left in the stack to take 2 of the same colour', CHAT_INFO_COLOR)
+          end
             return
         end
     else
@@ -751,7 +772,6 @@ function returnGemClicked(zone, player)
     end
     local colour = zone.getVar(COLOUR_NAME)
     moveTokens(playerGemZone(player, colour), bankGemZone(colour), 1)
-
     changeGemCount(player, colour, -1)
     if countCurrentPlayerTokens() <= MAX_TOKEN_COUNT then
         returnMode = false
@@ -801,32 +821,48 @@ function tintHelperSwitch(player, string)
   if string == "off" then
      tintHelper = false
     UI.setAttribute("tintHelper", "onClick", "tintHelperSwitch(on)")
-    UI.setAttribute("tintHelper", "icon", "tintHelperOn")
+    UI.setAttribute("tintHelper", "icon", "helperOff")
     removeTintCardButton()
   else
     tintHelper = true
     UI.setAttribute("tintHelper", "onClick", "tintHelperSwitch(off)")
-    UI.setAttribute("tintHelper", "icon", "tintHelperOff")
+    UI.setAttribute("tintHelper", "icon", "helperOn")
     cardPlayHelper(currentPlayer)
   end
 end
 
-function cardPlayHelper(player)
-if tintHelper then
-  if not isZoneEmpty(cardZone) then
-    local cardTable = cardZone.getObjects()
-    for i, card in pairs (cardTable) do
-      if isCard(card) then
-      local cardParsed = parseCard(card)
-      local cost = considerDiscount(player, cardParsed.cost)
-      local payment = checkPayment(player, cost)
-        if payment.valid then
-          tintCardButton (card)
-        end
-      end
+function soundSwitch(player, string)
+  if string == "ding" then
+     soundToggle = "ding"
+    UI.setAttribute("soundSwitch", "onClick", "soundSwitch(talk)")
+    UI.setAttribute("soundSwitch", "icon", "soundSwitchDing")
+  elseif string == "talk" then
+    soundToggle = "talk"
+    UI.setAttribute("soundSwitch", "onClick", "soundSwitch(mute)")
+    UI.setAttribute("soundSwitch", "icon", "soundSwitchTalk")
+  else
+    soundToggle = "mute"
+    UI.setAttribute("soundSwitch", "onClick", "soundSwitch(ding)")
+    UI.setAttribute("soundSwitch", "icon", "soundSwitchMute")
   end
 end
-end
+
+function cardPlayHelper(player)
+  if tintHelper then
+    if not isZoneEmpty(cardZone) then
+        local cardTable = cardZone.getObjects()
+        for i, card in pairs (cardTable) do
+          if isCard(card) then
+          local cardParsed = parseCard(card)
+          local cost = considerDiscount(player, cardParsed.cost)
+          local payment = checkPayment(player, cost)
+            if payment.valid then
+              tintCardButton (card)
+            end
+          end
+        end
+    end
+  end
 end
 
 function tintCardButton (card)
@@ -840,19 +876,18 @@ end
 
 function removeTintCardButton()
   if not isZoneEmpty(cardZone) then
-    local cardTable = cardZone.getObjects()
-    for i, card in pairs (cardTable) do
-      if isCard(card) then
-      buttonTable = card.getButtons()
-      for i, button in pairs (buttonTable) do
-        if button.label == "helperTint" then
-          warnAll(i)
-          card.removeButton(i-1)
+      local cardTable = cardZone.getObjects()
+      for i, card in pairs (cardTable) do
+          if isCard(card) then
+          buttonTable = card.getButtons()
+            for i, button in pairs (buttonTable) do
+              if button.label == "helperTint" then
+                card.removeButton(i-1)
+              end
+            end
         end
       end
-    end
-    end
-    end
+  end
 end
 
 
@@ -875,21 +910,21 @@ end
 
 function getTopTokensFromZone(zone, count)
     local topTokens = {}
-    if count == 0 or isZoneEmpty(zone) then
-        return topTokens
-    end
+      if count == 0 or isZoneEmpty(zone) then
+          return topTokens
+      end
     local yPositions = {}
-    for k, token in pairs(zone.getObjects()) do
-        table.insert(yPositions, token.getPosition().y)
-    end
+      for k, token in pairs(zone.getObjects()) do
+          table.insert(yPositions, token.getPosition().y)
+      end
     table.sort(yPositions)
     local skipCount = #zone.getObjects() - count
     local minY = yPositions[1 + skipCount]
-    for k, token in pairs(zone.getObjects()) do
-        if minY <= token.getPosition().y then
-            table.insert(topTokens, token)
-        end
-    end
+      for k, token in pairs(zone.getObjects()) do
+          if minY <= token.getPosition().y then
+              table.insert(topTokens, token)
+          end
+      end
     return topTokens
 end
 
@@ -898,19 +933,19 @@ function getTopTokenFromZone(zone)
 end
 
 function moveTokens(sourceZone, destinationZone, count)
-    if count == nil then
-        count = 1
-    end
+      if count == nil then
+          count = 1
+      end
     local yPos = destinationZone.getPosition().y - 0.55
     local topDestinationToken = getTopTokenFromZone(destinationZone)
-    if topDestinationToken != nil then
-        yPos = topDestinationToken.getPosition().y
-    end
+      if topDestinationToken != nil then
+          yPos = topDestinationToken.getPosition().y
+      end
     local topTokens = getTopTokensFromZone(sourceZone, count)
-    for i = 1, count do
-        yPos = yPos + 0.1
-        topTokens[i].setPositionSmooth({destinationZone.getPosition().x, yPos, destinationZone.getPosition().z})
-    end
+      for i = 1, count do
+          yPos = yPos + 0.1
+          topTokens[i].setPositionSmooth({destinationZone.getPosition().x, yPos, destinationZone.getPosition().z})
+      end
     sourceZone.setVar(ZONE_VARS.COUNT, sourceZone.getVar(ZONE_VARS.COUNT) - count)
     destinationZone.setVar(ZONE_VARS.COUNT, destinationZone.getVar(ZONE_VARS.COUNT) + count)
     createGemButtonsForZone(sourceZone)
@@ -953,14 +988,14 @@ function checkPayment(player, cost)
     local missingTokensCount = 0
     local newCost = cost
     local player = getPlayer(player)
-    for colourCode, value in pairs(cost) do
-        local color = colourCode..'GemCount'
-        local gemCount = player[color]
-        if gemCount < value then
-            missingTokensCount = missingTokensCount + (value - gemCount)
-            newCost[colourCode] = value - missingTokensCount
-        end
-    end
+      for colourCode, value in pairs(cost) do
+          local color = colourCode..'GemCount'
+          local gemCount = player[color]
+          if gemCount < value then
+              missingTokensCount = missingTokensCount + (value - gemCount)
+              newCost[colourCode] = value - missingTokensCount
+          end
+      end
     local goldGemCount = player['jGemCount']
     return {
         valid = goldGemCount >= missingTokensCount,
@@ -982,24 +1017,21 @@ function considerDiscount(player, cost)
     return newCost
 end
 
-
-
-
 function parseCostString(costString)
     local cost = {}
-    for capture in string.gmatch(costString, '%d+%a+') do
-        local value = costString.match(capture, '%d+')
-        local colour = costString.match(capture, '%a+')
-        cost[colour] = tonumber(value)
-    end
+      for capture in string.gmatch(costString, '%d+%a+') do
+          local value = costString.match(capture, '%d+')
+          local colour = costString.match(capture, '%a+')
+          cost[colour] = tonumber(value)
+      end
     return cost
 end
 
 function parseCard(object)
     local substrings = {}
-    for s in string.gmatch(object.getName(), '%S+') do
-        table.insert(substrings, s)
-    end
+      for s in string.gmatch(object.getName(), '%S+') do
+          table.insert(substrings, s)
+      end
     return {
         id = substrings[1],
         score = tonumber(substrings[2]),
@@ -1010,9 +1042,9 @@ end
 
 function parsePerson(object)
     local substrings = {}
-    for s in string.gmatch(object.getName(), '%S+') do
-        table.insert(substrings, s)
-    end
+      for s in string.gmatch(object.getName(), '%S+') do
+          table.insert(substrings, s)
+      end
     return {
         score = PERSON_SCORE,
         cost = parseCostString(substrings[1])
@@ -1023,16 +1055,16 @@ function dealNewCardInPlaceOf(object)
     local position = object.getPosition()
     local card = parseCard(object)
     local deck = decks[cardToDeckRefferences[card.id]]
-    if deck == nil then
-        return
-    elseif deck.getQuantity() > 2 then
-        dealCard(deck, cardPosition(position.x, position.z))
-    else
-        local deckPosition = deck.getPosition()
-        dealCard(deck, cardPosition(position.x, position.z))
-        local lastCard = deck.takeObject({top = false, position = deckPosition, smooth = false})
-        lastCard.createButton(DECK_BUTTON_PARAMS)
-    end
+      if deck == nil then
+          return
+      elseif deck.getQuantity() > 2 then
+          dealCard(deck, cardPosition(position.x, position.z))
+      else
+          local deckPosition = deck.getPosition()
+          dealCard(deck, cardPosition(position.x, position.z))
+          local lastCard = deck.takeObject({top = false, position = deckPosition, smooth = false})
+          lastCard.createButton(DECK_BUTTON_PARAMS)
+      end
 end
 
 function cardClicked(object, player, alt_click)
@@ -1061,7 +1093,11 @@ function onObjectPickUp(player, object)
         if contains(Player[player].getHandObjects(), object) then
             playCard(object, player, false)
         else
+          if soundToggle == 'talk' then
+            dingSound.AssetBundle.playTriggerEffect(6)
+          else
             Player[player].broadcast('You can only play your own cards. Duh.', CHAT_WARNING_COLOR)
+          end
             recreateCard(object, position)
             return
         end
@@ -1075,15 +1111,15 @@ function playCard(object, player, dealNext)
     if payment.valid then
         payCost(player, payment.cost, payment.goldCost)
         local cardZone = playerZones[player:lower()].cards[COST_COLOUR_NAMES[card.bonus]]
-        local objectJSON = object.getJSON()
-        object.destruct()
-        spawnObjectJSON({json = objectJSON, position = playerCardPosition(player, cardZone), rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}})
-        if dealNext then
-            dealNewCardInPlaceOf(object)
-        end
+        local position = playerCardPosition(player, cardZone)
+        local rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}
+        object.setRotationSmooth(rotation, false, false)
+        object.setPositionSmooth(position, false, false)
+          if dealNext then
+              dealNewCardInPlaceOf(object)
+          end
         awardPoints(player, card.score)
         addCardCount(player, card.bonus)
-        --increaseCardCount(player)
         nextTurn()
         return true
     else
@@ -1091,10 +1127,7 @@ function playCard(object, player, dealNext)
     end
     return false
 end
-function increaseCardCount(playerColour)
-    local player = getPlayer(playerColour)
-    player.cardCount = player.cardCount + 1
-end
+
 function reserveDeckCallback(object_spawned, params)
     object_spawned.interactable = true
     object_spawned.deal(1, params.player)
@@ -1102,7 +1135,11 @@ end
 
 function reserveCard(player, object, dealNext)
     if #Player[player].getHandObjects() >= MAX_HAND_SIZE then
+      if soundToggle == 'talk' then
+        dingSound.AssetBundle.playTriggerEffect(8)
+      else
         Player[player].broadcast('You can only have up to 3 cards reserved at a time', CHAT_INFO_COLOR)
+      end
     else
         if isDeck(object) then
             object.takeObject({position = {0, 0, 0}, callback = "reserveDeckCallback", callback_owner = Global, params = {player = player}})
@@ -1124,10 +1161,9 @@ function reserveCard(player, object, dealNext)
 end
 
 function recreateCard(object, position)
-    local objectJSON = object.getJSON()
+  local objectJSON = object.getJSON()
 	local interactable = object.interactable
-
-    object.destruct()
+  object.destruct()
 	spawnObjectJSON({json = objectJSON, position = position, rotation = rotation, callback = 'recreateCardCallback', callback_owner = Global, params = {interactable = interactable}})
 end
 
@@ -1139,26 +1175,24 @@ function checkPeopleStatus(player)
     local peopleAcquired = {}
       for k, person in pairs(availablePeople) do
         local cost = considerDiscount(player, person.parsed.cost)
-        if next(cost) == nil then
-          table.insert(peopleAcquired, person)
+          if next(cost) == nil then
+            table.insert(peopleAcquired, person)
+          end
+      end
+  if #peopleAcquired > 0 then
+    if #peopleAcquired > 1 then
+        for k, person in pairs(peopleAcquired) do
+          person.object.createButton(NOBEL_BUTTON_PARAMS)
         end
-      end
-if #peopleAcquired > 0 then
-  if #peopleAcquired > 1 then
-
-      for k, person in pairs(peopleAcquired) do
-        person.object.createButton(NOBEL_BUTTON_PARAMS)
-      end
-      warnAll('Pick nobel person card by clicking on it.')
-      noblePickMode = true
-      return false
-  end
-
+        warnAll('Pick nobel person card by clicking on it.')
+        noblePickMode = true
+        return false
+    end
     if noblePickMode == false then
       getNoblePerson(player, peopleAcquired[1])
     end
-end
-return true
+  end
+  return true
 end
 
 function nobelClicked(object, player)
@@ -1172,21 +1206,20 @@ function nobelClicked(object, player)
         warnAll('btn rem')
       end
     end
-
     for k, v in pairs (availablePeople) do
       if v.object == object then
         person = availablePeople[k]
       end
     end
-
-
   getNoblePerson(player, person)
   end
 end
 
 function getNoblePerson(player, person)
   local destination = playerCardPosition(player, playerZones[player:lower()].people)
-  person.object.setPositionSmooth(destination)
+  local rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}
+  person.object.setRotationSmooth(rotation, false, false)
+  person.object.setPositionSmooth(destination, false, false)
   table.remove(availablePeople, getIndex(availablePeople, person))
   awardPoints(player, 3)
   nextTurn()
