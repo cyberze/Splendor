@@ -91,8 +91,8 @@ local CARD_BUTTON_PARAMS = {
     click_function = "cardClicked",
     function_owner = self,
     position = {0, 0.3, 0},
-    height = 1520,
-    width = 1060,
+    height = 1590,
+    width = 1130,
     color = {0, 0, 0, 0},
     hover_color = {0, 1, 0, 0.4},
     tooltip = "Buy/Reserve"
@@ -465,6 +465,7 @@ function nextTurn(arg)
     if not checkPeopleStatus(currentPlayer) then
       return
     end
+    updateTable()
     noblePickMode = false
     if checkWinConditions(nextPlayerIndex, currentPlayerIndex) then
         currentPlayer = 'none'
@@ -477,7 +478,6 @@ function nextTurn(arg)
         return
     else
         setPlayerTurn(playersOrder[nextPlayerIndex])
-        updateTable()
     end
 end
 
@@ -1113,10 +1113,14 @@ function playCard(object, player, dealNext)
         local cardZone = playerZones[player:lower()].cards[COST_COLOUR_NAMES[card.bonus]]
         local position = playerCardPosition(player, cardZone)
         local rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}
-        object.setRotationSmooth(rotation, false, false)
-        object.setPositionSmooth(position, false, false)
+        local objectJSON = object.getJSON()
           if dealNext then
-              dealNewCardInPlaceOf(object)
+            object.setRotationSmooth(rotation, false, false)
+            object.setPositionSmooth(position, false, false)
+            dealNewCardInPlaceOf(object)
+          elseif not dealNext then
+            object.destruct()
+            spawnObjectJSON({json = objectJSON, position = position, rotation = rotation})
           end
         awardPoints(player, card.score)
         addCardCount(player, card.bonus)
@@ -1230,8 +1234,16 @@ function onObjectSpawn(obj)
 end
 
 function onObjectLeaveScriptingZone(zone, object)
-    if contains(handZones, zone) then
-	recreateCard(object, {zone.getPosition().x, zone.getPosition().y, zone.getPosition().z})
-	broadcastToColor("Please dont drag out of hand zone. Clicking will play card.", getIndex(handZones, zone), CHAT_WARNING_COLOR)
+  if contains(handZones, zone) then
+  	recreateCard(object, {zone.getPosition().x, zone.getPosition().y, zone.getPosition().z})
+  	broadcastToColor("Please dont drag out of hand zone. Clicking will play card.", getIndex(handZones, zone), CHAT_WARNING_COLOR)
 	end
+  if zone == cardZone then
+    if isCard(object) then
+      object.clearButtons()
+    end
+  end
+end
+
+function dummy()
 end
