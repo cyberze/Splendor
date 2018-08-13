@@ -17,12 +17,22 @@
   <HorizontalLayout childAlignment="LowerLeft">
     <Button id= "tintHelper" icon="helperOn" onClick="tintHelperSwitch(off)" color="" iconWidth="200"></Button>
     <Button id= "soundSwitch" icon="soundSwitchTalk" onClick="soundSwitch(mute)" color="" iconWidth="60"></Button>
+    <Button id= "rulesButton" icon="rulesButton" onClick="showRules" color="" iconWidth="200" visibility="nil"></Button>
   </HorizontalLayout>
 </Panel>
 
+<Panel id="rulesBook" width="900" height="900" rectAlignment="MiddleCenter" visibility="nil">
+    <HorizontalLayout childAlignment="MiddleCenter">
+        <VerticalScrollView childAlignment="UpperCenter" childForceExpandHeight="false" movementType="Elastic">
+          <Image type="Simple" preserveAspect="true" image="page1"></Image>
+          <Image type="Simple" preserveAspect="true" image="page2"></Image>
+          <Image type="Simple" preserveAspect="true" image="page3"></Image>
+          <Image type="Simple" preserveAspect="true" preferredWidth="1615" image="page4"></Image>
+        </VerticalScrollView>
+    </HorizontalLayout>
+</Panel>
 
-
-<Panel id="ScoreSheetPanel" class="WindowBorder" width="260" height="305" rectAlignment="MiddleRight" showAnimation="Grow" visibility="nil">
+<Panel id="ScoreSheetPanel" class="WindowBorder" width="260" height="305" rectAlignment="MiddleRight" visibility="nil">
     <TableLayout id="ScoreTable" class="ScoreTable">
         <Row id="ScoreRow1" class="ScoreTableRow"  dontUseTableRowBackground="true" visibility="nil" color="" outline="" outlineSize="5 5">
             <Cell>
