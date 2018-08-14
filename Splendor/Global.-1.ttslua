@@ -19,6 +19,8 @@ local PERSON_SCORE = 3
 local SCORE_TO_WIN = 15
 local noblePickMode = false
 local tintHelper = true
+local dev = true
+local dev2 = false
 local soundToggle = 'talk'
 local ZONE_VARS = {
     OWNER = 'name',
@@ -45,6 +47,1825 @@ local PLAYER_Y_ROTATION = {
     Red = 180,
     Green = 270
 }
+
+local xmlTable = {
+ {
+  tag = "Defaults",
+  attributes = {
+  },
+  children = {
+   {
+    tag = "TableLayout",
+    attributes = {
+     class = "ScoreTable",
+     width = "250",
+     height = "300",
+     rectAlignment = "UpperRight",
+     offsetXY = "-25 -50",
+     cellSpacing = "6",
+     cellPadding = "5 5 5 5",
+     columnWidths = "200 60",
+    },
+    children = {
+    },
+   },
+   {
+    tag = "Row",
+    attributes = {
+     class = "ScoreTableRow",
+     preferredHeight = "40",
+    },
+    children = {
+    },
+   },
+   {
+    tag = "Text",
+    attributes = {
+     color = "#FFFFFF",
+     fontSize = "16",
+    },
+    children = {
+    },
+   },
+  },
+ },
+ {
+  tag = "Panel",
+  attributes = {
+   id = "StartButton",
+   width = "800",
+   height = "280",
+   rectAlignment = "MiddleCenter",
+   offsetXY = "0 -400",
+   hideAnimation = "Shrink",
+   visibility = "Host",
+  },
+  children = {
+   {
+    tag = "Text",
+    value = "Please have all players seated and click Start to begin.",
+    attributes = {
+     alignment = "UpperCenter",
+     fontSize = "30",
+     fontStyle = "Bold",
+     color = "#ffa31a",
+    },
+    children = {
+    },
+   },
+   {
+    tag = "Text",
+    value = "Please consider rating this game on Steam workshop.",
+    attributes = {
+     alignment = "UpperCenter",
+     fontSize = "25",
+     fontStyle = "Bold",
+     color = "#ffff00",
+     offsetXY = "0 -33",
+    },
+    children = {
+    },
+   },
+   {
+    tag = "Button",
+    attributes = {
+     icon = "start",
+     alignment = "LowerCenter",
+     onClick = "prepareTable",
+     color = "",
+     width = "150",
+     height = "150",
+    },
+    children = {
+    },
+   },
+  },
+ },
+ {
+  tag = "TableLayout",
+  attributes = {
+   childAlignment = "MiddleLeft",
+   rectAlignment = "UpperLeft",
+   offsetXY = "1400 0",
+   columnWidths = "60 60 60",
+  },
+  children = {
+   {
+    tag = "Row",
+    attributes = {
+     preferredHeight = "60",
+    },
+    children = {
+     {
+      tag = "Cell",
+      attributes = {
+       preferredWidth = "60",
+      },
+      children = {
+       {
+        tag = "Button",
+        attributes = {
+         id = "soundSwitch",
+         icon = "soundSwitchTalk",
+         onClick = "soundSwitch(mute)",
+         color = "red",
+        },
+        children = {
+        },
+       },
+      },
+     },
+     {
+      tag = "Cell",
+      attributes = {
+       preferredWidth = "60",
+      },
+      children = {
+       {
+        tag = "Button",
+        attributes = {
+         id = "tintHelper",
+         icon = "helperOn",
+         onClick = "tintHelperSwitch(off)",
+         color = "green",
+        },
+        children = {
+        },
+       },
+      },
+     },
+     {
+      tag = "Cell",
+      attributes = {
+       preferredWidth = "60",
+      },
+      children = {
+       {
+        tag = "Button",
+        attributes = {
+         icon = "rulesButton",
+         onClick = "showRules()",
+         color = "blue",
+         visibility = "",
+        },
+        children = {
+        },
+       },
+      },
+     },
+    },
+   },
+  },
+ },
+ {
+  tag = "Panel",
+  attributes = {
+   id = "rulesBook",
+   width = "1000",
+   height = "1000",
+   rectAlignment = "MiddleCenter",
+   visibility = "nil",
+  },
+  children = {
+   {
+    tag = "HorizontalLayout",
+    attributes = {
+     width = "1000",
+     height = "1000",
+    },
+    children = {
+     {
+      tag = "VerticalScrollView",
+      attributes = {
+       preferredWidth = "800",
+       rectAlignment = "MiddleCenter",
+       childAlignment = "UpperCenter",
+       childForceExpandHeight = "true",
+       movementType = "Elastic",
+       scrollSensitivity = "50",
+      },
+      children = {
+       {
+        tag = "VerticalLayout",
+        attributes = {
+         width = "800",
+         height = "4000",
+        },
+        children = {
+         {
+          tag = "Panel",
+          attributes = {
+           width = "800",
+           height = "1000",
+          },
+          children = {
+           {
+            tag = "Image",
+            attributes = {
+             type = "Simple",
+             preserveAspect = "true",
+             image = "page1",
+            },
+            children = {
+            },
+           },
+          },
+         },
+         {
+          tag = "Panel",
+          attributes = {
+           width = "800",
+           height = "1000",
+          },
+          children = {
+           {
+            tag = "Image",
+            attributes = {
+             type = "Simple",
+             preserveAspect = "true",
+             image = "page2",
+            },
+            children = {
+            },
+           },
+          },
+         },
+         {
+          tag = "Panel",
+          attributes = {
+           width = "800",
+           height = "1000",
+          },
+          children = {
+           {
+            tag = "Image",
+            attributes = {
+             type = "Simple",
+             preserveAspect = "true",
+             image = "page3",
+            },
+            children = {
+            },
+           },
+          },
+         },
+         {
+          tag = "Panel",
+          attributes = {
+           width = "800",
+           height = "1000",
+          },
+          children = {
+           {
+            tag = "Image",
+            attributes = {
+             type = "Simple",
+             preserveAspect = "true",
+             image = "page4",
+            },
+            children = {
+            },
+           },
+          },
+         },
+        },
+       },
+      },
+     },
+     {
+      tag = "Panel",
+      attributes = {
+       preferredWidth = "200",
+       rectAlignment = "UpperRight",
+      },
+      children = {
+       {
+        tag = "Button",
+        attributes = {
+         icon = "rulesButtonOff",
+         offsetXY = "0 400",
+         onClick = "hideRules()",
+         color = "",
+         iconWidth = "100",
+        },
+        children = {
+        },
+       },
+      },
+     },
+    },
+   },
+  },
+ },
+ {
+  tag = "Panel",
+  attributes = {
+   id = "ScoreSheetPanel",
+   class = "WindowBorder",
+   width = "260",
+   height = "305",
+   rectAlignment = "MiddleRight",
+   visibility = "nil",
+  },
+  children = {
+   {
+    tag = "TableLayout",
+    attributes = {
+     id = "ScoreTable",
+     class = "ScoreTable",
+    },
+    children = {
+     {
+      tag = "Row",
+      attributes = {
+       id = "ScoreRow1",
+       class = "ScoreTableRow",
+       dontUseTableRowBackground = "true",
+       visibility = "nil",
+       color = "",
+       outline = "",
+       outlineSize = "5 5",
+      },
+      children = {
+       {
+        tag = "Cell",
+        attributes = {
+        },
+        children = {
+         {
+          tag = "Text",
+          value = "Player 1",
+          attributes = {
+           id = "playerID1",
+          },
+          children = {
+          },
+         },
+        },
+       },
+       {
+        tag = "Cell",
+        attributes = {
+        },
+        children = {
+         {
+          tag = "Text",
+          value = "0",
+          attributes = {
+           id = "playerScore1",
+          },
+          children = {
+          },
+         },
+        },
+       },
+      },
+     },
+     {
+      tag = "Row",
+      attributes = {
+       id = "ScoreRow2",
+       class = "ScoreTableRow",
+       dontUseTableRowBackground = "true",
+       visibility = "nil",
+       color = "",
+       outline = "",
+       outlineSize = "5 5",
+      },
+      children = {
+       {
+        tag = "Cell",
+        attributes = {
+        },
+        children = {
+         {
+          tag = "Text",
+          value = "Player 2",
+          attributes = {
+           id = "playerID2",
+          },
+          children = {
+          },
+         },
+        },
+       },
+       {
+        tag = "Cell",
+        attributes = {
+        },
+        children = {
+         {
+          tag = "Text",
+          value = "0",
+          attributes = {
+           id = "playerScore2",
+          },
+          children = {
+          },
+         },
+        },
+       },
+      },
+     },
+     {
+      tag = "Row",
+      attributes = {
+       id = "ScoreRow3",
+       class = "ScoreTableRow",
+       dontUseTableRowBackground = "true",
+       visibility = "nil",
+       color = "",
+       outline = "",
+       outlineSize = "5 5",
+      },
+      children = {
+       {
+        tag = "Cell",
+        attributes = {
+        },
+        children = {
+         {
+          tag = "Text",
+          value = "Player 3",
+          attributes = {
+           id = "playerID3",
+          },
+          children = {
+          },
+         },
+        },
+       },
+       {
+        tag = "Cell",
+        attributes = {
+        },
+        children = {
+         {
+          tag = "Text",
+          value = "0",
+          attributes = {
+           id = "playerScore3",
+          },
+          children = {
+          },
+         },
+        },
+       },
+      },
+     },
+     {
+      tag = "Row",
+      attributes = {
+       id = "ScoreRow4",
+       class = "ScoreTableRow",
+       dontUseTableRowBackground = "true",
+       visibility = "nil",
+       color = "",
+       outline = "#FFFFFF",
+       outlineSize = "5 5",
+      },
+      children = {
+       {
+        tag = "Cell",
+        attributes = {
+        },
+        children = {
+         {
+          tag = "Text",
+          value = "Player 4",
+          attributes = {
+           id = "playerID4",
+          },
+          children = {
+          },
+         },
+        },
+       },
+       {
+        tag = "Cell",
+        attributes = {
+        },
+        children = {
+         {
+          tag = "Text",
+          value = "0",
+          attributes = {
+           id = "playerScore4",
+          },
+          children = {
+          },
+         },
+        },
+       },
+      },
+     },
+    },
+   },
+  },
+ },
+ {
+  tag = "Panel",
+  attributes = {
+   id = "helperRed",
+   class = "WindowBorder",
+   width = "700",
+   height = "50",
+   offsetXY = "500 0",
+   rectAlignment = "LowerCenter",
+   showAnimation = "Grow",
+   visibility = "nil",
+   active = "true",
+  },
+  children = {
+   {
+    tag = "HorizontalLayout",
+    attributes = {
+     childForceExpandWidth = "false",
+     childAlignment = "MiddleCenter",
+    },
+    children = {
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "wGemCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "wCardCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "uGemCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "uCardCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "gGemCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "gCardCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "rGemCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "rCardCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "bGemCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "bCardCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "jGemCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ffd700",
+      },
+      children = {
+      },
+     },
+    },
+   },
+  },
+ },
+ {
+  tag = "Button",
+  value = "Hide",
+  attributes = {
+   id = "buttonRed",
+   fontStyle = "bold",
+   fontSize = "30",
+   offsetXY = "800 5",
+   rectAlignment = "LowerCenter",
+   alignment = "MiddleRight",
+   visibility = "nil",
+   onClick = "helperOnClick(on)",
+   color = "",
+   width = "100",
+   height = "40",
+  },
+  children = {
+  },
+ },
+ {
+  tag = "Panel",
+  attributes = {
+   id = "helperPink",
+   class = "WindowBorder",
+   width = "600",
+   height = "50",
+   offsetXY = "500 0",
+   rectAlignment = "LowerCenter",
+   showAnimation = "Grow",
+   visibility = "nil",
+  },
+  children = {
+   {
+    tag = "HorizontalLayout",
+    attributes = {
+     childForceExpandWidth = "false",
+     childAlignment = "MiddleCenter",
+    },
+    children = {
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "wGemCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "wCardCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "uGemCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "uCardCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "gGemCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "gCardCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "rGemCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "rCardCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "bGemCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "bCardCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "jGemCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ffd700",
+      },
+      children = {
+      },
+     },
+    },
+   },
+  },
+ },
+ {
+  tag = "Button",
+  value = "Hide",
+  attributes = {
+   id = "buttonPink",
+   fontStyle = "bold",
+   fontSize = "30",
+   offsetXY = "800 5",
+   rectAlignment = "LowerCenter",
+   alignment = "MiddleRight",
+   visibility = "nil",
+   onClick = "helperOnClick(on)",
+   color = "",
+   width = "100",
+   height = "40",
+  },
+  children = {
+  },
+ },
+ {
+  tag = "Panel",
+  attributes = {
+   id = "helperGreen",
+   class = "WindowBorder",
+   width = "600",
+   height = "50",
+   offsetXY = "500 0",
+   rectAlignment = "LowerCenter",
+   showAnimation = "Grow",
+   visibility = "nil",
+  },
+  children = {
+   {
+    tag = "HorizontalLayout",
+    attributes = {
+     childForceExpandWidth = "false",
+     childAlignment = "MiddleCenter",
+    },
+    children = {
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "wGemCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "wCardCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "uGemCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "uCardCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "gGemCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "gCardCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "rGemCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "rCardCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "bGemCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "bCardCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "jGemCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ffd700",
+      },
+      children = {
+      },
+     },
+    },
+   },
+  },
+ },
+ {
+  tag = "Button",
+  value = "Hide",
+  attributes = {
+   id = "buttonGreen",
+   fontStyle = "bold",
+   fontSize = "30",
+   offsetXY = "800 5",
+   rectAlignment = "LowerCenter",
+   alignment = "MiddleRight",
+   visibility = "nil",
+   onClick = "helperOnClick(on)",
+   color = "",
+   width = "100",
+   height = "40",
+  },
+  children = {
+  },
+ },
+ {
+  tag = "Panel",
+  attributes = {
+   id = "helperBlue",
+   class = "WindowBorder",
+   width = "600",
+   height = "50",
+   offsetXY = "500 0",
+   rectAlignment = "LowerCenter",
+   showAnimation = "Grow",
+   visibility = "nil",
+  },
+  children = {
+   {
+    tag = "HorizontalLayout",
+    attributes = {
+     childForceExpandWidth = "false",
+     childAlignment = "MiddleCenter",
+    },
+    children = {
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "wGemCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "wCardCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "uGemCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "uCardCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "gGemCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "gCardCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "rGemCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "rCardCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "bGemCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "bCardCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "jGemCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ffd700",
+      },
+      children = {
+      },
+     },
+    },
+   },
+  },
+ },
+ {
+  tag = "Button",
+  value = "Hide",
+  attributes = {
+   id = "buttonBlue",
+   fontStyle = "bold",
+   fontSize = "30",
+   offsetXY = "800 5",
+   rectAlignment = "LowerCenter",
+   alignment = "MiddleRight",
+   visibility = "nil",
+   onClick = "helperOnClick(on)",
+   color = "",
+   width = "100",
+   height = "40",
+  },
+  children = {
+  },
+ },
+}
+
 
 function gemButtonParams(tokenCount, mode)
     local yPos = (tokenCount * 0.1) - 0.5
@@ -240,6 +2061,13 @@ function onLoad()
     for k, deck in pairs(decks) do
         deck.interactable = false
     end
+    if dev2 then
+    local object = peopleBag
+    local table = UI.getXmlTable()
+    table = serializeTable(table)
+    object.setLuaScript(table)
+    object.interactable = true
+    end
 end
 
 function helperOnClick(player, string)
@@ -300,28 +2128,34 @@ end
 function prepareTable()
     players = getPlayers()
     playerCount = #players
+    if dev then
     playerCount = 4 -- dev override
+    end
 	if (playerCount < 2) then
 	   warnAll("Game requires two to four players to be seated")
 	   return
 	elseif (2 <= playerCount and playerCount <= 4) then
+    UI.setXmlTable(xmlTable)
 		initGlobalVariables()
     setPlayersOrder()
     destroyRedundantObjects()
     createGemButtons(true)
     shuffleAndDealCardsFromDecks()
     shuffleAndDealPeopleFromBag()
-    setNotes('\n')
     setPlayerTurn(playersOrder[1])
-    scoreTable()
-      for i, player in pairs(players) do
-          UI.setAttribute("helper"..player.colour, "visibility", player.colour)
-          UI.setAttribute("button"..player.colour, "visibility", player.colour)
-      end
+    Wait.frames(function() scoreTable() end, 1)
+    Wait.frames(function() scoreTableVisibility(players) end, 1)
     else
       warnAll("Game requires two to four players to be seated")
     end
 
+end
+
+function scoreTableVisibility (players)
+  for i, player in pairs(players) do
+      UI.setAttribute("helper"..player.colour, "visibility", player.colour)
+      UI.setAttribute("button"..player.colour, "visibility", player.colour)
+  end
 end
 
 function initGlobalVariables()
@@ -831,6 +2665,14 @@ function tintHelperSwitch(player, string)
   end
 end
 
+function showRules(player)
+  UI.setAttribute("rulesBook", "visibility", player.color)
+end
+
+function hideRules()
+  UI.setAttribute("rulesBook", "visibility", "nil")
+end
+
 function soundSwitch(player, string)
   if string == "ding" then
      soundToggle = "ding"
@@ -1104,6 +2946,42 @@ function onObjectPickUp(player, object)
     end
 end
 
+function serializeTable(val, name, skipnewlines, depth)
+    skipnewlines = skipnewlines or false
+    depth = depth or 0
+
+    local tmp = string.rep(" ", depth)
+
+    if name then
+      if type(name) == "number" then
+      tmp = tmp
+      else
+      tmp = tmp .. name .. " = "
+      end
+    end
+
+    if type(val) == "table" then
+        tmp = tmp .. "{" .. (not skipnewlines and "\n" or "")
+
+        for k, v in pairs(val) do
+              tmp =  tmp .. serializeTable(v, k, skipnewlines, depth + 1) .. "," .. (not skipnewlines and "\n" or "")
+        end
+
+        tmp = tmp .. string.rep(" ", depth) .. "}"
+    elseif type(val) == "number" then
+        tmp = tmp .. tostring(val)
+    elseif type(val) == "string" then
+        tmp = tmp .. string.format("%q", val)
+    elseif type(val) == "boolean" then
+        tmp = tmp .. (val and "true" or "false")
+    else
+        tmp = tmp .. "\"[inserializeable datatype:" .. type(val) .. "]\""
+    end
+
+    return tmp
+end
+
+
 function playCard(object, player, dealNext)
     local card = parseCard(object)
     local cost = considerDiscount(player, card.cost)
@@ -1247,3 +3125,1834 @@ end
 
 function dummy()
 end
+
+local xmlTable = {
+ {
+  tag = "Defaults",
+  attributes = {
+  },
+  children = {
+   {
+    tag = "TableLayout",
+    attributes = {
+     class = "ScoreTable",
+     width = "250",
+     height = "300",
+     rectAlignment = "UpperRight",
+     offsetXY = "-25 -50",
+     cellSpacing = "6",
+     cellPadding = "5 5 5 5",
+     columnWidths = "200 60",
+    },
+    children = {
+    },
+   },
+   {
+    tag = "Row",
+    attributes = {
+     class = "ScoreTableRow",
+     preferredHeight = "40",
+    },
+    children = {
+    },
+   },
+   {
+    tag = "Text",
+    attributes = {
+     color = "#FFFFFF",
+     fontSize = "16",
+    },
+    children = {
+    },
+   },
+  },
+ },
+ {
+  tag = "Panel",
+  attributes = {
+   id = "StartButton",
+   width = "800",
+   height = "280",
+   rectAlignment = "MiddleCenter",
+   offsetXY = "0 -400",
+   hideAnimation = "Shrink",
+   visibility = "nil",
+  },
+  children = {
+   {
+    tag = "Text",
+    value = "Please have all players seated and click Start to begin.",
+    attributes = {
+     alignment = "UpperCenter",
+     fontSize = "30",
+     fontStyle = "Bold",
+     color = "#ffa31a",
+    },
+    children = {
+    },
+   },
+   {
+    tag = "Text",
+    value = "Please consider rating this game on Steam workshop.",
+    attributes = {
+     alignment = "UpperCenter",
+     fontSize = "25",
+     fontStyle = "Bold",
+     color = "#ffff00",
+     offsetXY = "0 -33",
+    },
+    children = {
+    },
+   },
+   {
+    tag = "Button",
+    attributes = {
+     icon = "start",
+     alignment = "LowerCenter",
+     onClick = "prepareTable",
+     color = "",
+     width = "150",
+     height = "150",
+    },
+    children = {
+    },
+   },
+  },
+ },
+ {
+  tag = "TableLayout",
+  attributes = {
+   childAlignment = "MiddleLeft",
+   rectAlignment = "UpperLeft",
+   offsetXY = "1400 0",
+   columnWidths = "60 60 60",
+  },
+  children = {
+   {
+    tag = "Row",
+    attributes = {
+     preferredHeight = "60",
+    },
+    children = {
+     {
+      tag = "Cell",
+      attributes = {
+       preferredWidth = "60",
+      },
+      children = {
+       {
+        tag = "Button",
+        attributes = {
+         id = "soundSwitch",
+         icon = "soundSwitchTalk",
+         onClick = "soundSwitch(mute)",
+         color = "red",
+        },
+        children = {
+        },
+       },
+      },
+     },
+     {
+      tag = "Cell",
+      attributes = {
+       preferredWidth = "60",
+      },
+      children = {
+       {
+        tag = "Button",
+        attributes = {
+         id = "tintHelper",
+         icon = "helperOn",
+         onClick = "tintHelperSwitch(off)",
+         color = "green",
+        },
+        children = {
+        },
+       },
+      },
+     },
+     {
+      tag = "Cell",
+      attributes = {
+       preferredWidth = "60",
+      },
+      children = {
+       {
+        tag = "Button",
+        attributes = {
+         icon = "rulesButton",
+         onClick = "showRules()",
+         color = "blue",
+         visibility = "",
+        },
+        children = {
+        },
+       },
+      },
+     },
+    },
+   },
+  },
+ },
+ {
+  tag = "Panel",
+  attributes = {
+   id = "rulesBook",
+   width = "1000",
+   height = "1000",
+   rectAlignment = "MiddleCenter",
+   visibility = "nil",
+  },
+  children = {
+   {
+    tag = "HorizontalLayout",
+    attributes = {
+     width = "1000",
+     height = "1000",
+    },
+    children = {
+     {
+      tag = "VerticalScrollView",
+      attributes = {
+       preferredWidth = "800",
+       rectAlignment = "MiddleCenter",
+       childAlignment = "UpperCenter",
+       childForceExpandHeight = "true",
+       movementType = "Elastic",
+       scrollSensitivity = "50",
+      },
+      children = {
+       {
+        tag = "VerticalLayout",
+        attributes = {
+         width = "800",
+         height = "4000",
+        },
+        children = {
+         {
+          tag = "Panel",
+          attributes = {
+           width = "800",
+           height = "1000",
+          },
+          children = {
+           {
+            tag = "Image",
+            attributes = {
+             type = "Simple",
+             preserveAspect = "true",
+             image = "page1",
+            },
+            children = {
+            },
+           },
+          },
+         },
+         {
+          tag = "Panel",
+          attributes = {
+           width = "800",
+           height = "1000",
+          },
+          children = {
+           {
+            tag = "Image",
+            attributes = {
+             type = "Simple",
+             preserveAspect = "true",
+             image = "page2",
+            },
+            children = {
+            },
+           },
+          },
+         },
+         {
+          tag = "Panel",
+          attributes = {
+           width = "800",
+           height = "1000",
+          },
+          children = {
+           {
+            tag = "Image",
+            attributes = {
+             type = "Simple",
+             preserveAspect = "true",
+             image = "page3",
+            },
+            children = {
+            },
+           },
+          },
+         },
+         {
+          tag = "Panel",
+          attributes = {
+           width = "800",
+           height = "1000",
+          },
+          children = {
+           {
+            tag = "Image",
+            attributes = {
+             type = "Simple",
+             preserveAspect = "true",
+             image = "page4",
+            },
+            children = {
+            },
+           },
+          },
+         },
+        },
+       },
+      },
+     },
+     {
+      tag = "Panel",
+      attributes = {
+       preferredWidth = "200",
+       rectAlignment = "UpperRight",
+      },
+      children = {
+       {
+        tag = "Button",
+        attributes = {
+         icon = "rulesButtonOff",
+         offsetXY = "0 400",
+         onClick = "hideRules()",
+         color = "",
+         iconWidth = "100",
+        },
+        children = {
+        },
+       },
+      },
+     },
+    },
+   },
+  },
+ },
+ {
+  tag = "Panel",
+  attributes = {
+   id = "ScoreSheetPanel",
+   class = "WindowBorder",
+   width = "260",
+   height = "305",
+   rectAlignment = "MiddleRight",
+   visibility = "",
+  },
+  children = {
+   {
+    tag = "TableLayout",
+    attributes = {
+     id = "ScoreTable",
+     class = "ScoreTable",
+    },
+    children = {
+     {
+      tag = "Row",
+      attributes = {
+       id = "ScoreRow1",
+       class = "ScoreTableRow",
+       dontUseTableRowBackground = "true",
+       visibility = "nil",
+       color = "",
+       outline = "",
+       outlineSize = "5 5",
+      },
+      children = {
+       {
+        tag = "Cell",
+        attributes = {
+        },
+        children = {
+         {
+          tag = "Text",
+          value = "Player 1",
+          attributes = {
+           id = "playerID1",
+           text = "CyberZe",
+          },
+          children = {
+          },
+         },
+        },
+       },
+       {
+        tag = "Cell",
+        attributes = {
+        },
+        children = {
+         {
+          tag = "Text",
+          value = "0",
+          attributes = {
+           id = "playerScore1",
+           text = "0",
+          },
+          children = {
+          },
+         },
+        },
+       },
+      },
+     },
+     {
+      tag = "Row",
+      attributes = {
+       id = "ScoreRow2",
+       class = "ScoreTableRow",
+       dontUseTableRowBackground = "true",
+       visibility = "nil",
+       color = "",
+       outline = "",
+       outlineSize = "5 5",
+      },
+      children = {
+       {
+        tag = "Cell",
+        attributes = {
+        },
+        children = {
+         {
+          tag = "Text",
+          value = "Player 2",
+          attributes = {
+           id = "playerID2",
+          },
+          children = {
+          },
+         },
+        },
+       },
+       {
+        tag = "Cell",
+        attributes = {
+        },
+        children = {
+         {
+          tag = "Text",
+          value = "0",
+          attributes = {
+           id = "playerScore2",
+          },
+          children = {
+          },
+         },
+        },
+       },
+      },
+     },
+     {
+      tag = "Row",
+      attributes = {
+       id = "ScoreRow3",
+       class = "ScoreTableRow",
+       dontUseTableRowBackground = "true",
+       visibility = "nil",
+       color = "",
+       outline = "",
+       outlineSize = "5 5",
+      },
+      children = {
+       {
+        tag = "Cell",
+        attributes = {
+        },
+        children = {
+         {
+          tag = "Text",
+          value = "Player 3",
+          attributes = {
+           id = "playerID3",
+          },
+          children = {
+          },
+         },
+        },
+       },
+       {
+        tag = "Cell",
+        attributes = {
+        },
+        children = {
+         {
+          tag = "Text",
+          value = "0",
+          attributes = {
+           id = "playerScore3",
+          },
+          children = {
+          },
+         },
+        },
+       },
+      },
+     },
+     {
+      tag = "Row",
+      attributes = {
+       id = "ScoreRow4",
+       class = "ScoreTableRow",
+       dontUseTableRowBackground = "true",
+       visibility = "nil",
+       color = "",
+       outline = "#FFFFFF",
+       outlineSize = "5 5",
+      },
+      children = {
+       {
+        tag = "Cell",
+        attributes = {
+        },
+        children = {
+         {
+          tag = "Text",
+          value = "Player 4",
+          attributes = {
+           id = "playerID4",
+          },
+          children = {
+          },
+         },
+        },
+       },
+       {
+        tag = "Cell",
+        attributes = {
+        },
+        children = {
+         {
+          tag = "Text",
+          value = "0",
+          attributes = {
+           id = "playerScore4",
+          },
+          children = {
+          },
+         },
+        },
+       },
+      },
+     },
+    },
+   },
+  },
+ },
+ {
+  tag = "Panel",
+  attributes = {
+   id = "helperRed",
+   class = "WindowBorder",
+   width = "700",
+   height = "50",
+   offsetXY = "500 0",
+   rectAlignment = "LowerCenter",
+   showAnimation = "Grow",
+   visibility = "Red",
+   active = "true",
+  },
+  children = {
+   {
+    tag = "HorizontalLayout",
+    attributes = {
+     childForceExpandWidth = "false",
+     childAlignment = "MiddleCenter",
+    },
+    children = {
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "wGemCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#FFFFFF",
+       text = "2",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "wCardCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#FFFFFF",
+       text = "2",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "uGemCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#0000ff",
+       text = "0",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "uCardCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#0000ff",
+       text = "0",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "gGemCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#008000",
+       text = "0",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "gCardCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#008000",
+       text = "0",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "rGemCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ff0000",
+       text = "2",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "rCardCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ff0000",
+       text = "2",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "bGemCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#000000",
+       text = "0",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "bCardCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#000000",
+       text = "0",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "jGemCountRed",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ffd700",
+       text = "0",
+      },
+      children = {
+      },
+     },
+    },
+   },
+  },
+ },
+ {
+  tag = "Button",
+  value = "Hide",
+  attributes = {
+   id = "buttonRed",
+   fontStyle = "bold",
+   fontSize = "30",
+   offsetXY = "800 5",
+   rectAlignment = "LowerCenter",
+   alignment = "MiddleRight",
+   visibility = "Red",
+   onClick = "helperOnClick(on)",
+   color = "",
+   width = "100",
+   height = "40",
+  },
+  children = {
+  },
+ },
+ {
+  tag = "Panel",
+  attributes = {
+   id = "helperPink",
+   class = "WindowBorder",
+   width = "600",
+   height = "50",
+   offsetXY = "500 0",
+   rectAlignment = "LowerCenter",
+   showAnimation = "Grow",
+   visibility = "nil",
+  },
+  children = {
+   {
+    tag = "HorizontalLayout",
+    attributes = {
+     childForceExpandWidth = "false",
+     childAlignment = "MiddleCenter",
+    },
+    children = {
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "wGemCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "wCardCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "uGemCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "uCardCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "gGemCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "gCardCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "rGemCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "rCardCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "bGemCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "bCardCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "jGemCountPink",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ffd700",
+      },
+      children = {
+      },
+     },
+    },
+   },
+  },
+ },
+ {
+  tag = "Button",
+  value = "Hide",
+  attributes = {
+   id = "buttonPink",
+   fontStyle = "bold",
+   fontSize = "30",
+   offsetXY = "800 5",
+   rectAlignment = "LowerCenter",
+   alignment = "MiddleRight",
+   visibility = "nil",
+   onClick = "helperOnClick(on)",
+   color = "",
+   width = "100",
+   height = "40",
+  },
+  children = {
+  },
+ },
+ {
+  tag = "Panel",
+  attributes = {
+   id = "helperGreen",
+   class = "WindowBorder",
+   width = "600",
+   height = "50",
+   offsetXY = "500 0",
+   rectAlignment = "LowerCenter",
+   showAnimation = "Grow",
+   visibility = "nil",
+  },
+  children = {
+   {
+    tag = "HorizontalLayout",
+    attributes = {
+     childForceExpandWidth = "false",
+     childAlignment = "MiddleCenter",
+    },
+    children = {
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "wGemCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "wCardCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "uGemCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "uCardCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "gGemCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "gCardCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "rGemCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "rCardCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "bGemCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "bCardCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "jGemCountGreen",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ffd700",
+      },
+      children = {
+      },
+     },
+    },
+   },
+  },
+ },
+ {
+  tag = "Button",
+  value = "Hide",
+  attributes = {
+   id = "buttonGreen",
+   fontStyle = "bold",
+   fontSize = "30",
+   offsetXY = "800 5",
+   rectAlignment = "LowerCenter",
+   alignment = "MiddleRight",
+   visibility = "nil",
+   onClick = "helperOnClick(on)",
+   color = "",
+   width = "100",
+   height = "40",
+  },
+  children = {
+  },
+ },
+ {
+  tag = "Panel",
+  attributes = {
+   id = "helperBlue",
+   class = "WindowBorder",
+   width = "600",
+   height = "50",
+   offsetXY = "500 0",
+   rectAlignment = "LowerCenter",
+   showAnimation = "Grow",
+   visibility = "nil",
+  },
+  children = {
+   {
+    tag = "HorizontalLayout",
+    attributes = {
+     childForceExpandWidth = "false",
+     childAlignment = "MiddleCenter",
+    },
+    children = {
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "wGemCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "wCardCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#FFFFFF",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "uGemCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "uCardCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#0000ff",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "gGemCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "gCardCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#008000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "rGemCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "rCardCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#ff0000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "bGemCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "(",
+      attributes = {
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "bCardCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = ")",
+      attributes = {
+       fontSize = "40",
+       color = "#000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "a",
+      attributes = {
+       fontSize = "40",
+       color = "#00000000",
+      },
+      children = {
+      },
+     },
+     {
+      tag = "Text",
+      value = "0",
+      attributes = {
+       id = "jGemCountBlue",
+       fontStyle = "bold",
+       fontSize = "40",
+       color = "#ffd700",
+      },
+      children = {
+      },
+     },
+    },
+   },
+  },
+ },
+ {
+  tag = "Button",
+  value = "Hide",
+  attributes = {
+   id = "buttonBlue",
+   fontStyle = "bold",
+   fontSize = "30",
+   offsetXY = "800 5",
+   rectAlignment = "LowerCenter",
+   alignment = "MiddleRight",
+   visibility = "nil",
+   onClick = "helperOnClick(on)",
+   color = "",
+   width = "100",
+   height = "40",
+  },
+  children = {
+  },
+ }
+}
